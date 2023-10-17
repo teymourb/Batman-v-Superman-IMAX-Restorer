@@ -28,7 +28,8 @@ Choose between 2 **constant-width** IMAX Restorations:
 <br>
 
 #### INSTRUCTIONS:  
-- Extract the zip file in a drive where you have at least 160 GB of free space  
+- Extract the zip file in a drive where you have at least 160 GB of free space
+- Launch *Batman-v-Superman-IMAX-Restorer.bat* and disregard the unknow publisher prompt  
 - Select your source rip .mkv file when prompted  
 - Select your destination folder for the output file  
 - If prompted to accept or decline a command towards the end of the encoding, enter y for yes
