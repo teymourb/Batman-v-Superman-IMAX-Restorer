@@ -3,13 +3,21 @@ Restore your preferred IMAX version of the 4K Ultra HD Blu-Ray of Batman v Super
 
 <br>
 
-REQUIREMENTS:  
+#### REQUIREMENTS:  
 - An unaltered .mkv rip of the 4K Ultra HD Blu-ray disc *Batman v Superman: Dawn of Justice Ultimate Edition* (2021 Remaster)
 - 160 GB of free space (not including the source .mkv file)
 
 *No other version will work with this program! You are free to keep whichever audio and subtitle tracks you wish when ripping your disc. Only the video track must be the same.*
 
 <br>
+
+#### INSTRUCTIONS:  
+- Extract the zip file in a drive where you have at least 160 GB of free space  
+- Select your source rip .mkv file when prompted  
+- Select your destination folder for the output file  
+- If prompted to accept or decline a command towards the end of the encoding, enter y for yes
+- If the program is interrupted at any point or has failed, making sure to delete the *temp* folder in /docs/. This will be done automatically if the program is executed again.
+
 <br>
 
 ## Original version:
@@ -60,6 +68,8 @@ On the 4K Blu-ray disc of BvS, the different types of scenes are encoded as foll
   - Active image: 3080 x 2160 (1.43:1)
   - Container: 3840 x 2160 (1.78:1)
 
+<br>
+
 **Best suited for:**
   - Projectors with ~1.43:1 wall/screen (or with decent masking options)
   - ~1.43:1 displays such as 4:3 TVs, tall monitors/screens (such as MacBooks)
@@ -76,7 +86,8 @@ On the 4K Blu-ray disc of BvS, the different types of scenes are encoded as foll
 
   ---
 
-More info here:  
+### See also:
+
 [Reddit | r/fanedits Restoration thread](https://www.reddit.com/r/fanedits/comments/1637r5g/batman_v_superman_dawn_of_justice_ultimate/)  
 [Reddit | r/fanedits Program thread](https://www.reddit.com/r/fanedits/comments/171rpft/beta_testing_fanedit_program_batman_v_superman/)  
 [fanedit.org | Forums Restoration thread](https://forums.fanedit.org/threads/batman-v-superman-dawn-of-justice-ultimate-edition-imax-1-43-1-1-78-1-restorations-4k-uhd-hdr10.29021/)
