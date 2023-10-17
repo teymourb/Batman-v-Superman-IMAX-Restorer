@@ -1,0 +1,170 @@
+************************************* Invoked: Mon Mar 6 14:14:14 2023
+[0] Arguments: C:\Users\Teymour\Downloads\Avidemux_2.8.1VC++64bits.exe
+[5] Operations sanity check succeeded.
+[1796] xxxxxxxxxxxx
+[1800] Created question message box "question": "Uninstall", "I will now uninstall the previous version of avidemux VC++"
+[14759] backup  operation: Mkdir
+[14759] 	- arguments: C:/Program Files/Avidemux 2.8 VC++ 64bits
+[14759] Done
+[14759] perform  operation: Mkdir
+[14759] 	- arguments: C:/Program Files/Avidemux 2.8 VC++ 64bits
+[14760] Done
+[14760] Starting elevated process "C:\\Users\\Teymour\\Downloads\\Avidemux_2.8.1VC++64bits.exe" with arguments " --startserver PRODUCTION,{12b119ce-63cb-4f75-940d-e41fb02af2df},{5ad55d99-23f2-4d08-a37f-30b419590695}"
+[16407] Finished starting elevated process.
+[16424] perform  operation: Mkdir
+[16424] 	- arguments: C:/Program Files/Avidemux 2.8 VC++ 64bits
+[16426] Done
+[16426] Install size: 1 components
+[16451] backup org.avidemux.run operation: Extract
+[16451] 	- arguments: installer://org.avidemux.run/2.8.1content.7z, C:\Program Files\Avidemux 2.8 VC++ 64bits
+[16451] Done
+[16452] perform org.avidemux.run operation: Extract
+[16452] 	- arguments: installer://org.avidemux.run/2.8.1content.7z, C:\Program Files\Avidemux 2.8 VC++ 64bits
+[17519] Done
+[17519] backup org.avidemux.run operation: CreateShortcut
+[17519] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/avidemux.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/avidemux.lnk, workingDirectory=C:\Program Files\Avidemux 2.8 VC++ 64bits
+[17521] Done
+[17521] perform org.avidemux.run operation: CreateShortcut
+[17521] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/avidemux.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/avidemux.lnk
+[17603] Done
+[17603] backup org.avidemux.run operation: CreateShortcut
+[17603] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/avidemux_jobs.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/avidemux_jobs.lnk, workingDirectory=C:\Program Files\Avidemux 2.8 VC++ 64bits
+[17604] Done
+[17604] perform org.avidemux.run operation: CreateShortcut
+[17604] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/avidemux_jobs.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/avidemux_jobs.lnk
+[17632] Done
+[17632] backup org.avidemux.run operation: CreateShortcut
+[17632] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.lnk, workingDirectory=C:\Program Files\Avidemux 2.8 VC++ 64bits
+[17632] Done
+[17633] perform org.avidemux.run operation: CreateShortcut
+[17633] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.lnk
+[17646] Done
+[17646] backup org.avidemux.run operation: Extract
+[17646] 	- arguments: installer://org.avidemux.run/2.8.1platforms.7z, C:\Program Files\Avidemux 2.8 VC++ 64bits
+[17646] Done
+[17646] perform org.avidemux.run operation: Extract
+[17646] 	- arguments: installer://org.avidemux.run/2.8.1platforms.7z, C:\Program Files\Avidemux 2.8 VC++ 64bits
+[17676] Done
+[17676] backup org.avidemux.run operation: CreateShortcut
+[17676] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/avidemux.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/avidemux.lnk, workingDirectory=C:\Program Files\Avidemux 2.8 VC++ 64bits
+[17677] Done
+[17677] perform org.avidemux.run operation: CreateShortcut
+[17677] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/avidemux.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/avidemux.lnk
+[17692] Done
+[17693] backup org.avidemux.run operation: CreateShortcut
+[17693] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/avidemux_jobs.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/avidemux_jobs.lnk, workingDirectory=C:\Program Files\Avidemux 2.8 VC++ 64bits
+[17693] Done
+[17694] perform org.avidemux.run operation: CreateShortcut
+[17694] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/avidemux_jobs.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/avidemux_jobs.lnk
+[17706] Done
+[17706] backup org.avidemux.run operation: CreateShortcut
+[17706] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.lnk, workingDirectory=C:\Program Files\Avidemux 2.8 VC++ 64bits
+[17707] Done
+[17707] perform org.avidemux.run operation: CreateShortcut
+[17707] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.lnk
+[17719] Done
+[17719] backup org.avidemux.run operation: Extract
+[17719] 	- arguments: installer://org.avidemux.run/2.8.1plugins.7z, C:\Program Files\Avidemux 2.8 VC++ 64bits
+[17719] Done
+[17719] perform org.avidemux.run operation: Extract
+[17719] 	- arguments: installer://org.avidemux.run/2.8.1plugins.7z, C:\Program Files\Avidemux 2.8 VC++ 64bits
+[18888] Done
+[18888] backup org.avidemux.run operation: CreateShortcut
+[18888] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/avidemux.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/avidemux.lnk, workingDirectory=C:\Program Files\Avidemux 2.8 VC++ 64bits
+[18889] Done
+[18889] perform org.avidemux.run operation: CreateShortcut
+[18889] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/avidemux.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/avidemux.lnk
+[18904] Done
+[18904] backup org.avidemux.run operation: CreateShortcut
+[18904] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/avidemux_jobs.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/avidemux_jobs.lnk, workingDirectory=C:\Program Files\Avidemux 2.8 VC++ 64bits
+[18905] Done
+[18905] perform org.avidemux.run operation: CreateShortcut
+[18905] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/avidemux_jobs.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/avidemux_jobs.lnk
+[18918] Done
+[18919] backup org.avidemux.run operation: CreateShortcut
+[18919] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.lnk, workingDirectory=C:\Program Files\Avidemux 2.8 VC++ 64bits
+[18920] Done
+[18920] perform org.avidemux.run operation: CreateShortcut
+[18920] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.lnk
+[18931] Done
+[18931] backup org.avidemux.run operation: Extract
+[18931] 	- arguments: installer://org.avidemux.run/2.8.1qt5.7z, C:\Program Files\Avidemux 2.8 VC++ 64bits
+[18931] Done
+[18931] perform org.avidemux.run operation: Extract
+[18931] 	- arguments: installer://org.avidemux.run/2.8.1qt5.7z, C:\Program Files\Avidemux 2.8 VC++ 64bits
+[19122] Done
+[19122] backup org.avidemux.run operation: CreateShortcut
+[19122] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/avidemux.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/avidemux.lnk, workingDirectory=C:\Program Files\Avidemux 2.8 VC++ 64bits
+[19123] Done
+[19124] perform org.avidemux.run operation: CreateShortcut
+[19124] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/avidemux.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/avidemux.lnk
+[19138] Done
+[19138] backup org.avidemux.run operation: CreateShortcut
+[19138] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/avidemux_jobs.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/avidemux_jobs.lnk, workingDirectory=C:\Program Files\Avidemux 2.8 VC++ 64bits
+[19139] Done
+[19139] perform org.avidemux.run operation: CreateShortcut
+[19139] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/avidemux_jobs.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/avidemux_jobs.lnk
+[19151] Done
+[19151] backup org.avidemux.run operation: CreateShortcut
+[19151] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.lnk, workingDirectory=C:\Program Files\Avidemux 2.8 VC++ 64bits
+[19152] Done
+[19152] perform org.avidemux.run operation: CreateShortcut
+[19152] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.lnk
+[19164] Done
+[19164] backup org.avidemux.run operation: Extract
+[19164] 	- arguments: installer://org.avidemux.run/2.8.1scripts.7z, C:\Program Files\Avidemux 2.8 VC++ 64bits
+[19164] Done
+[19164] perform org.avidemux.run operation: Extract
+[19164] 	- arguments: installer://org.avidemux.run/2.8.1scripts.7z, C:\Program Files\Avidemux 2.8 VC++ 64bits
+[19169] Done
+[19170] backup org.avidemux.run operation: CreateShortcut
+[19170] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/avidemux.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/avidemux.lnk, workingDirectory=C:\Program Files\Avidemux 2.8 VC++ 64bits
+[19170] Done
+[19171] perform org.avidemux.run operation: CreateShortcut
+[19171] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/avidemux.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/avidemux.lnk
+[19184] Done
+[19184] backup org.avidemux.run operation: CreateShortcut
+[19184] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/avidemux_jobs.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/avidemux_jobs.lnk, workingDirectory=C:\Program Files\Avidemux 2.8 VC++ 64bits
+[19184] Done
+[19186] perform org.avidemux.run operation: CreateShortcut
+[19186] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/avidemux_jobs.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/avidemux_jobs.lnk
+[19199] Done
+[19199] backup org.avidemux.run operation: CreateShortcut
+[19199] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.lnk, workingDirectory=C:\Program Files\Avidemux 2.8 VC++ 64bits
+[19200] Done
+[19200] perform org.avidemux.run operation: CreateShortcut
+[19200] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.lnk
+[19212] Done
+[19212] backup org.avidemux.run operation: Extract
+[19212] 	- arguments: installer://org.avidemux.run/2.8.1styles.7z, C:\Program Files\Avidemux 2.8 VC++ 64bits
+[19212] Done
+[19212] perform org.avidemux.run operation: Extract
+[19212] 	- arguments: installer://org.avidemux.run/2.8.1styles.7z, C:\Program Files\Avidemux 2.8 VC++ 64bits
+[19221] Done
+[19221] backup org.avidemux.run operation: CreateShortcut
+[19221] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/avidemux.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/avidemux.lnk, workingDirectory=C:\Program Files\Avidemux 2.8 VC++ 64bits
+[19221] Done
+[19222] perform org.avidemux.run operation: CreateShortcut
+[19222] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/avidemux.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/avidemux.lnk
+[19234] Done
+[19235] backup org.avidemux.run operation: CreateShortcut
+[19235] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/avidemux_jobs.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/avidemux_jobs.lnk, workingDirectory=C:\Program Files\Avidemux 2.8 VC++ 64bits
+[19235] Done
+[19236] perform org.avidemux.run operation: CreateShortcut
+[19236] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/avidemux_jobs.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/avidemux_jobs.lnk
+[19249] Done
+[19249] backup org.avidemux.run operation: CreateShortcut
+[19249] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.lnk, workingDirectory=C:\Program Files\Avidemux 2.8 VC++ 64bits
+[19250] Done
+[19250] perform org.avidemux.run operation: CreateShortcut
+[19250] 	- arguments: C:\Program Files\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.exe, C:\Users\Teymour\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.lnk
+[19262] Done
+[19262] backup org.avidemux.run operation: License
+[19262] 	- arguments:
+[19262] Done
+[19262] perform org.avidemux.run operation: License
+[19262] 	- arguments:
+[19265] Done
+[19275] Writing maintenance tool: "C:\\Program Files\\Avidemux 2.8 VC++ 64bits/Uninstall Avidemux VC++ 64bits.exe.new"
+[19569] Wrote permissions for maintenance tool.
+[19679] Maintenance tool restart: false.
