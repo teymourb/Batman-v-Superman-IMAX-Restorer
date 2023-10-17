@@ -1,7 +1,10 @@
 # Batman-v-Superman-IMAX-Restorer
-Restore your preferred IMAX version of the 4K Ultra HD Blu-Ray of Batman v Superman: Dawn of Justice Ultimate Edition (Remastered) HDR10.
+*Created by [@teymourb](https://github.com/teymourb) and [@rsquared256](https://github.com/rsquared256)*
 
 <br>
+
+Restore your preferred IMAX version of the 4K Ultra HD Blu-Ray of Batman v Superman: Dawn of Justice Ultimate Edition (Remastered) HDR10.
+
 
 #### REQUIREMENTS:  
 - An unaltered .mkv rip of the 4K Ultra HD Blu-ray disc *Batman v Superman: Dawn of Justice Ultimate Edition* (2021 Remaster)
