@@ -1,16 +1,29 @@
 # Batman-v-Superman-IMAX-Restorer
 *Created by [@teymourb](https://github.com/teymourb) and [@rsquared256](https://github.com/rsquared256)*
 
-<br>
+![BvS_Poster](https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/assets/53331006/25df373b-859c-4074-b82a-663acdd5db4b)
 
-Restore your preferred IMAX version of the 4K Ultra HD Blu-Ray of Batman v Superman: Dawn of Justice Ultimate Edition (Remastered) HDR10.
 
+<p align="center">
+    <a href="https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/releases" target="_blank" rel="noopener"><img src="https://img.shields.io/github/release/Batman-v-Superman-IMAX-Restorer/Batman-v-Superman-IMAX-Restorer.svg" alt="Latest releases" /></a>
+</p>
+
+***Batman-v-Superman-IMAX-Restorer*** is an experimental program that allows you to restore your preferred IMAX version of the 4K Ultra HD Blu-Ray of *Batman v Superman: Dawn of Justice Ultimate Edition* with HDR10 (2021 Remaster) .
+
+Choose between 2 **constant-width** IMAX Restorations:
+<!-- toc -->
+
+- [1. IMAX 1.78:1 - *à la Nolan* IMAX Blu-ray discs](#1-imax-1781)
+- [2. IMAX 1.43:1 (unmasked) - Mom's *We have IMAX GT 1.43:1 at home*](#2-imax-1431-unmasked)
+
+<!-- tocstop -->
 
 #### REQUIREMENTS:  
 - An unaltered .mkv rip of the 4K Ultra HD Blu-ray disc *Batman v Superman: Dawn of Justice Ultimate Edition* (2021 Remaster)
 - 160 GB of free space (not including the source .mkv file)
 
-*No other version will work with this program! You are free to keep whichever audio and subtitle tracks you wish when ripping your disc. Only the video track must be the same.*
+> [!WARNING]
+> No other version will work with this program! You are free to keep whichever audio and subtitle tracks you wish when ripping your disc. Only the video track needs to be the same.
 
 <br>
 
@@ -37,16 +50,16 @@ On the 4K Blu-ray disc of BvS, the different types of scenes are encoded as foll
 <br>
 <br>
 
-## Choose between the following 2 constant-width IMAX versions:
 
 
-# 1) IMAX 1.78:1 - *à la Nolan* IMAX Blu-ray discs
+# 1. IMAX 1.78:1
+> ...*à la Nolan* IMAX Blu-ray discs
   - IMAX sequences **cropped** to 3080 x 1732 (1.78:1), then
-  - IMAX sequences upscaled to 3840 x 2160 (1.78:1)
-  - Scope sequences left unaltered at active picture of 3840 x 1606 (2.39:1), **letterboxed** within a 3840 x 2160 (1.78:1) container
-  - Picture Constant-width: 3840, Variable height: 2160 (IMAX 1.78:1 sequences), 1606 (Scope 2.39:1 sequences)
+  - IMAX sequences upscaled to **3840 x 2160** (**1.78:1**)
+  - Scope sequences left unaltered at active picture of **3840 x 1606** (**2.39:1**), **letterboxed** within a 3840 x 2160 (1.78:1) container
+  - Picture **Constant-width**: 3840, Variable height: 2160 (IMAX 1.78:1 sequences), 1606 (Scope 2.39:1 sequences)
   - Active image: 3840 x 2160 (1.78:1)
-  - Container: 3840 x 2160 (1.78:1)
+  - **Container**: 3840 x 2160 (1.78:1)
 
 <br>
 
@@ -63,13 +76,14 @@ On the 4K Blu-ray disc of BvS, the different types of scenes are encoded as foll
 
 ---
 
-# 2) IMAX 1.43:1 (unmasked) - Mom's *We have IMAX GT 1.43:1 at home*
-  - Scope sequences downscaled to 3080 x 1288 (2.39:1) active picture, 3080 x 1732 (1.78:1) container, then
+# 2. IMAX 1.43:1 (unmasked)
+> Mom's "*We have IMAX GT 1.43:1 at home*"
+  - Scope sequences downscaled to **3080 x 1288** (**2.39:1**) active picture, 3080 x 1732 (1.78:1) container, then
   - Scope sequences container **windowboxed** (pillarboxed + letterboxed) to 3840 x 2160 (1.78:1)
-  - IMAX sequences left unaltered at active picture of 3080 x 2160 (1.43:1), **pillarboxed** within a 3840 x 2160 (1.78:1) container
+  - IMAX sequences left unaltered at active picture of **3080 x 2160** (**1.43:1**), **pillarboxed** within a 3840 x 2160 (1.78:1) container
   - Picture Constant-width: 3080, Variable height: 2160 (IMAX 1.43:1 sequences), 1288 (Scope 2.39:1 sequences)
   - Active image: 3080 x 2160 (1.43:1)
-  - Container: 3840 x 2160 (1.78:1)
+  - **Container**: 3840 x 2160 (1.78:1)
 
 <br>
 
@@ -78,8 +92,8 @@ On the 4K Blu-ray disc of BvS, the different types of scenes are encoded as foll
   - ~1.43:1 displays such as 4:3 TVs, tall monitors/screens (such as MacBooks)
   - Perfect for most recent iPads (1.43:1)
   - VR (if viewing app has a cropping tool or if pillarboxing won't be noticeable/distracting)  
-*Special viewing setups instructions:*  
-  Using VLC (or other), you can crop 380 px left and 380 px right for MacBooks or native 4:3 projectors/displays
+
+> For MacBooks and native 4:3 projectors/displays, you should crop 380 px left and 380 px right of the image in your media player's settings (VLC, MPC...)
 
 <br>
 
