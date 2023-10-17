@@ -8,7 +8,7 @@
     <a href="https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/releases" target="_blank" rel="noopener"><img src="https://img.shields.io/github/release/teymourb/Batman-v-Superman-IMAX-Restorer.svg" alt="Latest releases" /></a>
 </p>
 
-***Batman-v-Superman-IMAX-Restorer*** is an experimental program that allows you to restore your preferred IMAX version of the 4K Ultra HD Blu-Ray of *Batman v Superman: Dawn of Justice Ultimate Edition* with HDR10 (2021 Remaster) .
+***Batman-v-Superman-IMAX-Restorer*** is an experimental program from the fanedit community which allows you to restore your preferred IMAX version of the 4K Ultra HD Blu-Ray of *Batman v Superman: Dawn of Justice Ultimate Edition* with HDR10 (2021 Remaster) .
 
 Choose between 2 **constant-width** IMAX Restorations:
 <!-- toc -->
