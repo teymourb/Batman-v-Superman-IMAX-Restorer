@@ -6,7 +6,7 @@ On the 4K Blu-ray disc of BvS, the different types of scenes are encoded as foll
 - The IMAX sequences have an active image of 3080 x 2160 (1.43:1) pillarboxed (black bars right and left) within a 3840 x 2160 (1.78:1) container.
 - The Scope sequences have an active image of 3840 x 1606 (2.39:1) letterboxed (black bars top and bottom) within a 3840 x 2160 (1.78:1) container.
 
-![IMAX 1 43 - variable width](https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/assets/53331006/7ecbed44-5201-4299-ae5e-8234d3ebfff2)
+![IMAX 1 43 - variable width](https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/assets/53331006/88eb1174-3b0c-4d0b-9249-8e6eac907e47)
 
 Choose between the following 2 constant-width IMAX versions:
 
@@ -20,7 +20,7 @@ Choose between the following 2 constant-width IMAX versions:
   - Active image: 3840 x 2160 (1.78:1)
   - Container: 3840 x 2160 (1.78:1)
 
-![IMAX 1 78](https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/assets/53331006/d7843e2f-b7d7-400a-87a2-aefc1ff61402)
+![IMAX 1 78](https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/assets/53331006/a18b611d-afda-47fe-9d22-59c31c8a7026)
 
 Best suited for 16:9 screens
 
@@ -42,8 +42,8 @@ Best suited for:
 Viewing setups instructions:
   Using VLC, you can crop 380 px left and 380 px right for MacBooks or native 4:3 projectors/displays
 
-![IMAX 1 43_unmasked](https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/assets/53331006/e47e86e6-9bc2-4fad-bbce-993d7e53db02)
-  
+![IMAX 1 43](https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/assets/53331006/7d156169-9167-4aaf-824f-cd3eb833e2de)
+
   ---
 
 More info here: https://www.reddit.com/r/fanedits/comments/1637r5g/batman_v_superman_dawn_of_justice_ultimate/
