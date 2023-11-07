@@ -1,0 +1,12 @@
+[submodule "docs/programs/avidemux2"]
+	path = docs/programs/avidemux2
+	url = https://github.com/mean00/avidemux2.git
+[submodule "docs/programs/FFmpeg"]
+	path = docs/programs/FFmpeg
+	url = https://github.com/FFmpeg/FFmpeg.git
+[submodule "docs/programs/HandBrake"]
+	path = docs/programs/HandBrake
+	url = https://github.com/HandBrake/HandBrake.git
+[submodule "docs/programs/mkvtoolnix"]
+	path = docs/programs/mkvtoolnix
+	url = https://gitlab.com/mbunkus/mkvtoolnix.git
