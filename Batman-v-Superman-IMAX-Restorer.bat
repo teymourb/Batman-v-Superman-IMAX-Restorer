@@ -13,15 +13,6 @@ if exist temp (
     cd ..
 )
 
-if not exist temp (
-	::Unzip ffmpeg.zip
-	cd "docs\programs\ffmpeg"
-	tar -xf ffmpeg.zip
-	cd ..
-	cd ..
-	cd ..
-)
-
 ::Making sure batch file drive location has enough space
 echo Please make sure you have extracted the 7z zip file to a drive with 160GB of free space.
 echo If this is correct press Enter
