@@ -183,7 +183,7 @@ if %version%==1 (
 	echo If this was the wrong choice please restart this program
 	PAUSE
 	
-	docs\programs\mkvtoolnix\mkvmerge -o "BvS.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "%file%"
+	docs\programs\mkvtoolnix\mkvmerge -o "docs\temp\BvS.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "%file%"
 	
 	::Extracting 5 unaltered (IMAX) files
 	echo Spliting BvS_1i.mkv
