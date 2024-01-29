@@ -50,7 +50,6 @@ for /f "usebackq delims=" %%I in (`powershell %psCommand%`) do set "folder=%%I"
 
 setlocal enabledelayedexpansion
 echo You chose !folder!
-endlocal
 
 ::Define loop point for incorrect input
 :a
@@ -168,9 +167,10 @@ if %version%==1 (
 
 	::Merging altered video with source rip, keeping only video track of the first and all but video track of the latter for the output file
 	echo Remuxing audio and subtitles
-	docs\programs\mkvtoolnix\mkvmerge -o "!folder!Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.78.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.78.mkv" -D --no-video "%file%"
-
-
+	docs\programs\mkvtoolnix\mkvmerge -o "!folder!\Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.78.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.78.mkv" -D --no-video "%file%"
+	
+	endlocal
+	
 	::Deleting altered video with incorrect non-video tracks
 	echo Deleting BvS_1.78.mkv
 	del "docs\temp\BvS_1.78.mkv"
@@ -275,10 +275,10 @@ if %version%==1 (
 
 	::Merging altered video with source rip, keeping only video track of the first and all but video track of the latter for the output file
 	echo Remuxing audio and subtitles
-	docs\programs\mkvtoolnix\mkvmerge -o "!folder!Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.43 (unmasked).mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.43.mkv" -D --no-video "%file%"
-
-
-
+	docs\programs\mkvtoolnix\mkvmerge -o "!folder!\Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.43 (unmasked).mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.43.mkv" -D --no-video "%file%"
+	
+	endlocal
+	
 	::Deleting altered video with incorrect non-video tracks
 	echo Deleting BvS_1.43.mkv
 	del "docs\temp\BvS_1.43.mkv"
