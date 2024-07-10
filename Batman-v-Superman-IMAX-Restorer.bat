@@ -37,6 +37,18 @@ Title Batman v Superman: Dawn of Justice Ultimate Edition IMAX Restorer
 )>"%tmp%\%~n0.vbs"
 for /f "tokens=* delims=" %%p in ('Cscript /NoLogo "%tmp%\%~n0.vbs"') do set "file=%%p"
 echo %file%
+
+
+::In case file path prompt wasn't successful
+echo Did a dialog prompt you to select your file and if so, were you successful? [y/n]
+
+set /p dialog=Input:
+
+if %dialog%==n (
+	echo Please enter the full path to your file.
+	echo You may be able to drag and drop the file on the terminal for the same result:
+	set /p "file=Enter file path: "
+)
 pause
 
 
@@ -50,6 +62,23 @@ for /f "usebackq delims=" %%I in (`powershell %psCommand%`) do set "folder=%%I"
 
 setlocal enabledelayedexpansion
 echo You chose !folder!
+
+
+::In case file path prompt wasn't successful
+echo Did a dialog prompt you to select your folder and if so, were you successful? [y/n]
+
+set /p dialog2=Input:
+
+if %dialog2%==n (
+	echo Please enter the full path to your folder:
+	echo You may be able to drag and drop the folder on the terminal for the same result:
+	set /p "folder=Enter folder path: "
+	set "folder=!folder:"=!"
+	if not "!folder:~-1!"=="\" set "folder=!folder!\"
+	echo !folder!
+)
+pause
+
 
 ::Define loop point for incorrect input
 :a
@@ -69,8 +98,12 @@ if %version%==1 (
 	echo If this is correct press Enter
 	echo If this was the wrong choice please restart this program
 	PAUSE
-	
-	docs\programs\mkvtoolnix\mkvmerge -o "docs\temp\BvS.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "%file%"
+
+	if %dialog%==y (
+		docs\programs\mkvtoolnix\mkvmerge -o "docs\temp\BvS.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "%file%"
+	) else if %dialog%==n (
+		docs\programs\mkvtoolnix\mkvmerge -o "docs\temp\BvS.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags !file!
+	)
 
 	::Extracting 5 unaltered (scope) files
 	echo Splitting BvS_2s.mkv
@@ -167,7 +200,21 @@ if %version%==1 (
 
 	::Merging altered video with source rip, keeping only video track of the first and all but video track of the latter for the output file
 	echo Remuxing audio and subtitles
-	docs\programs\mkvtoolnix\mkvmerge -o "!folder!\Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.78.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.78.mkv" -D --no-video "%file%"
+	set "hello=Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.78.mkv"
+	set "result=!folder!!hello!"
+	if %dialog%==y (
+		if %dialog2%==y (
+			docs\programs\mkvtoolnix\mkvmerge -o "!folder!\Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.78.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.78.mkv" -D --no-video "%file%"
+		) else if %dialog2%==n (
+			docs\programs\mkvtoolnix\mkvmerge -o "!result!" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.78.mkv" -D --no-video "%file%"
+		)
+	) else if %dialog%==n (
+		if %dialog2%==y (
+			docs\programs\mkvtoolnix\mkvmerge -o "!folder!\Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.78.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.78.mkv" -D --no-video !file!
+		) else if %dialog2%==n (
+			docs\programs\mkvtoolnix\mkvmerge -o "!result!" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.78.mkv" -D --no-video !file!
+		)
+	)
 	
 	endlocal
 	
@@ -182,9 +229,13 @@ if %version%==1 (
 	echo If this is correct press Enter
 	echo If this was the wrong choice please restart this program
 	PAUSE
-	
-	docs\programs\mkvtoolnix\mkvmerge -o "docs\temp\BvS.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "%file%"
-	
+
+	if %dialog%==y (
+		docs\programs\mkvtoolnix\mkvmerge -o "docs\temp\BvS.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "%file%"
+	) else if %dialog%==n (
+		docs\programs\mkvtoolnix\mkvmerge -o "docs\temp\BvS.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags !file!
+	)
+
 	::Extracting 5 unaltered (IMAX) files
 	echo Spliting BvS_1i.mkv
 	docs\programs\ffmpeg\ffmpeg -threads 0 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 7388 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_1i.mkv"
@@ -275,8 +326,22 @@ if %version%==1 (
 
 	::Merging altered video with source rip, keeping only video track of the first and all but video track of the latter for the output file
 	echo Remuxing audio and subtitles
-	docs\programs\mkvtoolnix\mkvmerge -o "!folder!\Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.43 (unmasked).mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.43.mkv" -D --no-video "%file%"
-	
+	set "hello=Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.43 (unmasked).mkv"
+	set "result=!folder!!hello!"
+	if %dialog%==y (
+		if %dialog2%==y (
+			docs\programs\mkvtoolnix\mkvmerge -o "!folder!\Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.43 (unmasked).mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.43.mkv" -D --no-video "%file%"
+		) else if %dialog2%==n (
+			docs\programs\mkvtoolnix\mkvmerge -o "!result!" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.43.mkv" -D --no-video "%file%"
+		)
+	) else if %dialog%==n (
+		if %dialog2%==y (
+			docs\programs\mkvtoolnix\mkvmerge -o "!folder!\Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.43 (unmasked).mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.43.mkv" -D --no-video !file!
+		) else if %dialog2%==n (
+			docs\programs\mkvtoolnix\mkvmerge -o "!result!" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.43.mkv" -D --no-video !file!
+		)
+	)
+
 	endlocal
 	
 	::Deleting altered video with incorrect non-video tracks
