@@ -2,6 +2,14 @@
 
 ## Unreleased — proposed 1.0.1
 
+- Stop failed preparation/splitting/encoding/assembly immediately, record stage
+  diagnostics and reject missing/empty expected outputs before dependent work.
+- Catch negative native-process crash statuses as well as positive failures.
+- Preserve all intermediate files and logs even when final remux succeeds:
+  Avidemux does not reliably propagate append/save errors. Output creation now
+  returns warning status 1 pending manual completeness review. More free disk
+  space is required; automatic cleanup needs independent assembly qualification.
+
 - Anchor execution to the launcher folder and refuse an existing temporary
   workspace instead of deleting retained work on restart.
 - Remove wildcard cleanup; preserve unexpected temporary files/subdirectories

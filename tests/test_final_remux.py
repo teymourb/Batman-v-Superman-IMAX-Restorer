@@ -30,6 +30,7 @@ def media_commands(text):
         line = line.strip()
         if line.startswith('docs\\programs\\'):
             line = line.split(' > "docs\\temp\\final-remux.log"', 1)[0]
+            line = line.split(' >> "docs\\temp\\processing.log"', 1)[0]
             commands.append(line)
     return '\n'.join(commands).encode()
 
@@ -47,8 +48,8 @@ class SourceRegression(unittest.TestCase):
             for error, warning in commands:
                 self.assertEqual(error.strip(), 'if errorlevel 2 goto remux_failed')
                 self.assertEqual(warning.strip(), 'if errorlevel 1 goto remux_warning')
-            self.assertLess(block.index('if not exist "!final_output!"'),
-                            block.index('del "docs\\temp\\BvS_1.'))
+            self.assertIn('if not exist "!final_output!"', block)
+            self.assertNotRegex(block, r'(?im)^\s*del\s')
 
     def test_terminal_handlers_do_not_delete_retained_files(self):
         handlers = TEXT.split('\n:remux_warning\n', 1)[1]
@@ -119,14 +120,14 @@ class WindowsRemux(unittest.TestCase):
         return result, intermediate, root / 'args.txt', output_dir
 
     def test_branch_and_exit_status_matrix(self):
-        for mode, dialog, dialog2, code in itertools.product((1, 2), ('y', 'n'), ('y', 'n'), (0, 1, 2, 9)):
+        for mode, dialog, dialog2, code in itertools.product((1, 2), ('y', 'n'), ('y', 'n'), (0, 1, 2, 9, -1073741819)):
             with self.subTest(mode=mode, source=dialog, destination=dialog2, code=code):
                 with tempfile.TemporaryDirectory(prefix='restorer with spaces ') as folder:
                     root = Path(folder)
                     result, intermediate, args_path, output_dir = self.run_block(
                         root, mode, dialog, dialog2, code)
-                    self.assertEqual(result.returncode, min(code, 2), result.stdout + result.stderr)
-                    self.assertEqual(intermediate.exists(), code != 0)
+                    self.assertEqual(result.returncode, 0 if code == 0 else 1 if code == 1 else 2, result.stdout + result.stderr)
+                    self.assertEqual(intermediate.exists(), True)
                     self.assertEqual('Done!' in result.stdout, code == 0)
                     args = args_path.read_text().splitlines()
                     self.assertIn('docs\\temp\\' + intermediate.name, args)
@@ -173,7 +174,7 @@ class WindowsRemux(unittest.TestCase):
                         Path(run_dir), mode, 'y', 'n', real_tool=tool,
                         source=source, assembled=video)
                     self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-                    self.assertFalse(intermediate.exists())
+                    self.assertTrue(intermediate.exists())
                     output = next(output_dir.glob('*.mkv'))
                     # H.264 packet payloads should remain identical. PCM audio may
                     # be re-packetized by mkvmerge: compare its concatenated sample

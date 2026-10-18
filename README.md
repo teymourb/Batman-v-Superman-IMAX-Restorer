@@ -112,8 +112,16 @@ On the 4K Blu-ray disc of BvS, the different types of scenes are encoded as foll
 
 ## Maintenance candidate: temporary work
 
-The proposed 1.0.1 keeps the assembled video and `docs/temp/final-remux.log`
-after final-remux warnings or errors. A new run preserves any existing `docs/temp`
-and stops. Move that folder somewhere safe before starting another restoration.
-Unexpected temporary files also survive successful cleanup. A destination file
-left after an error may be incomplete. Earlier-stage failure handling is unchanged.
+The proposed 1.0.1 stops preparation, splitting, encoding and assembly when a
+tool reports failure or its expected output is missing or empty. Diagnostics go
+to `docs/temp/processing.log`; final remux diagnostics go to `final-remux.log`.
+These checks do not prove that the assembled film is complete. The bundled
+Avidemux can report success after an append/save failure.
+
+All intermediates and logs are therefore retained, including after an output is
+created. Completion returns warning status 1 and asks you to review the result.
+Keep substantially more free disk space than previous versions: prepared video,
+raw splits, encoded splits, assembly and final output can coexist. There is no
+automatic resume. A new run stops if `docs/temp` already exists; after reviewing
+the output, move that folder somewhere safe before another restoration. A file
+left after a failure may be incomplete. Published 1.0.0 is unchanged.
