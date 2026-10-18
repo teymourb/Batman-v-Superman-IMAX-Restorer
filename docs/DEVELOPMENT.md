@@ -70,3 +70,24 @@ encoding and assembly stages. Then simplify repeated input/remux branches while
 preserving command baselines. Introduce portable planning/profile code when there
 is a demonstrated shared need. Source fingerprint qualification is separate and
 synthetic-first; the reported BvS hash is not an implemented acceptance gate.
+
+## Stage-safety branch (not yet Windows-qualified)
+
+Preparation, splitting, HandBrake encoding and Avidemux assembly have immediate
+positive/negative exit gates, fixed-path nonempty output checks and processing.log
+stage diagnostics. Assembly requires every fixed load/append input first. Media
+arguments remain byte-identical to the original command baseline. Final remux
+also rejects negative process exit codes.
+
+Avidemux 2.8.1 does not reliably propagate append/save failures, so these checks
+are structural guards, not completeness qualification. All intermediate inputs,
+assembly and logs remain even after output creation; production completion returns
+warning 1 and asks for review. This intentionally increases peak disk usage.
+Independent assembly completeness qualification is needed before automatic cleanup
+can safely return. No automatic resume and no private-media access.
+
+New native stub tests execute entire production mode control flow while bypassing
+only dialogs/PAUSE. They inject positive errors, negative crashes with partial
+outputs, missing/empty successful outputs at every pre-remux stage, missing tools
+and MKVToolNix preparation warnings. macOS: five static checks pass; eleven Windows
+methods skip. Actual Windows evidence remains required before merging this branch.

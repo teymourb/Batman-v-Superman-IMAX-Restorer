@@ -82,6 +82,7 @@ echo 2) IMAX 1.43:1 ^(Scope scenes windowboxed - unmasked 16:9 container^)
 ::Get input from user
 set /p version=Input: 
 
+echo Tool diagnostics are written to docs\temp\processing.log during processing.
 ::Check what version to use and make sure the user selected the right one
 if %version%==1 (
 	
@@ -91,101 +92,207 @@ if %version%==1 (
 	PAUSE
 
 	if %dialog%==y (
-		docs\programs\mkvtoolnix\mkvmerge -o "docs\temp\BvS.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "%file%"
+		set "stage_name=mkvmerge: BvS.mkv"
+		echo Stage: !stage_name!>> "docs\temp\processing.log"
+		docs\programs\mkvtoolnix\mkvmerge -o "docs\temp\BvS.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "%file%" >> "docs\temp\processing.log" 2>&1
+		if errorlevel 2 goto stage_failed
+		if errorlevel 1 goto stage_warning
+		if not errorlevel 0 goto stage_failed
+		call :require_stage_output "docs\temp\BvS.mkv"
+		if errorlevel 1 goto stage_failed
 	) else if %dialog%==n (
-		docs\programs\mkvtoolnix\mkvmerge -o "docs\temp\BvS.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags !file!
+		set "stage_name=mkvmerge: BvS.mkv"
+		echo Stage: !stage_name!>> "docs\temp\processing.log"
+		docs\programs\mkvtoolnix\mkvmerge -o "docs\temp\BvS.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags !file! >> "docs\temp\processing.log" 2>&1
+		if errorlevel 2 goto stage_failed
+		if errorlevel 1 goto stage_warning
+		if not errorlevel 0 goto stage_failed
+		call :require_stage_output "docs\temp\BvS.mkv"
+		if errorlevel 1 goto stage_failed
 	)
 
 	::Extracting 5 unaltered (scope) files
 	echo Splitting BvS_2s.mkv
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 00:05:09.142 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 85890 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_2s.mkv"
+	set "stage_name=ffmpeg: BvS_2s.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 00:05:09.142 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 85890 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_2s.mkv" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_2s.mkv"
+	if errorlevel 1 goto stage_failed
 
 	echo Splitting BvS_4s.mkv
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 01:09:18.715 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 77191 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_4s.mkv"
+	set "stage_name=ffmpeg: BvS_4s.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 01:09:18.715 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 77191 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_4s.mkv" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_4s.mkv"
+	if errorlevel 1 goto stage_failed
 
 	echo Splitting BvS_6s.mkv
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:10:22.606 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 44494 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_6s.mkv"
+	set "stage_name=ffmpeg: BvS_6s.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:10:22.606 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 44494 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_6s.mkv" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_6s.mkv"
+	if errorlevel 1 goto stage_failed
 
 	echo Splitting BvS_8s.mkv
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:50:35.850 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 4163 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_8s.mkv"
+	set "stage_name=ffmpeg: BvS_8s.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:50:35.850 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 4163 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_8s.mkv" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_8s.mkv"
+	if errorlevel 1 goto stage_failed
 
 	echo Splitting BvS_10s.mkv
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:54:43.862 -noaccurate_seek -i "docs\temp\BvS.mkv" -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_10s.mkv"
+	set "stage_name=ffmpeg: BvS_10s.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:54:43.862 -noaccurate_seek -i "docs\temp\BvS.mkv" -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_10s.mkv" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_10s.mkv"
+	if errorlevel 1 goto stage_failed
 
 
 
 	::Extracting, encoding(cropping) and deleting(original) for the 5 other files (IMAX)
 	echo Splitting BvS_1i.mkv
-	docs\programs\ffmpeg\ffmpeg -threads 0 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 7388 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_1i.mkv"
+	set "stage_name=ffmpeg: BvS_1i.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\ffmpeg\ffmpeg -threads 0 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 7388 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_1i.mkv" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_1i.mkv"
+	if errorlevel 1 goto stage_failed
 
 	echo Cropping BvS_1i.mkv
-	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_1i.mkv" -o "docs\temp\BvS_1i_Cropped.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 50800 -2 --cfr -w 3840 -l 2160 --crop 214:214:380:380
+	set "stage_name=HandBrakeCLI: BvS_1i_Cropped.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_1i.mkv" -o "docs\temp\BvS_1i_Cropped.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 50800 -2 --cfr -w 3840 -l 2160 --crop 214:214:380:380 >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_1i_Cropped.mkv"
+	if errorlevel 1 goto stage_failed
 
-	echo Deleting BvS_1i.mkv
-	del "docs\temp\BvS_1i.mkv"
 
 	echo Splitting BvS_3i.mkv
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 01:04:51.470 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 6427 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_3i.mkv"
+	set "stage_name=ffmpeg: BvS_3i.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 01:04:51.470 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 6427 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_3i.mkv" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_3i.mkv"
+	if errorlevel 1 goto stage_failed
 
 	echo Cropping BvS_3i.mkv
-	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_3i.mkv" -o "docs\temp\BvS_3i_Cropped.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 39400 -2 --cfr -w 3840 -l 2160 --crop 214:214:380:380
+	set "stage_name=HandBrakeCLI: BvS_3i_Cropped.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_3i.mkv" -o "docs\temp\BvS_3i_Cropped.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 39400 -2 --cfr -w 3840 -l 2160 --crop 214:214:380:380 >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_3i_Cropped.mkv"
+	if errorlevel 1 goto stage_failed
 
-	echo Deleting BvS_3i.mkv
-	del "docs\temp\BvS_3i.mkv"
 
 	echo Splitting BvS_5i.mkv
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:02:58.190 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 10633 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_5i.mkv"
+	set "stage_name=ffmpeg: BvS_5i.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:02:58.190 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 10633 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_5i.mkv" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_5i.mkv"
+	if errorlevel 1 goto stage_failed
 
 	echo Cropping BvS_5i.mkv
-	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_5i.mkv" -o "docs\temp\BvS_5i_Cropped.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 53000 -2 --cfr -w 3840 -l 2160 --crop 214:214:380:380
+	set "stage_name=HandBrakeCLI: BvS_5i_Cropped.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_5i.mkv" -o "docs\temp\BvS_5i_Cropped.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 53000 -2 --cfr -w 3840 -l 2160 --crop 214:214:380:380 >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_5i_Cropped.mkv"
+	if errorlevel 1 goto stage_failed
 
-	echo Deleting BvS_5i.mkv
-	del "docs\temp\BvS_5i.mkv"
 
 	echo Splitting BvS_7i.mkv
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:41:18.377 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 13366 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_7i.mkv"
+	set "stage_name=ffmpeg: BvS_7i.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:41:18.377 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 13366 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_7i.mkv" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_7i.mkv"
+	if errorlevel 1 goto stage_failed
 
 	echo Cropping BvS_7i.mkv
-	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_7i.mkv" -o "docs\temp\BvS_7i_Cropped.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 50000 -2 --cfr -w 3840 -l 2160 --crop 214:214:380:380
+	set "stage_name=HandBrakeCLI: BvS_7i_Cropped.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_7i.mkv" -o "docs\temp\BvS_7i_Cropped.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 50000 -2 --cfr -w 3840 -l 2160 --crop 214:214:380:380 >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_7i_Cropped.mkv"
+	if errorlevel 1 goto stage_failed
 
-	echo Deleting BvS_7i.mkv
-	del "docs\temp\BvS_7i.mkv"
 
 	echo Splitting BvS_9i.mkv
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:53:29.482 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 1804 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -map_metadata -1 -y "docs\temp\BvS_9i.mkv"
+	set "stage_name=ffmpeg: BvS_9i.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:53:29.482 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 1804 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -map_metadata -1 -y "docs\temp\BvS_9i.mkv" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_9i.mkv"
+	if errorlevel 1 goto stage_failed
 
 	echo Cropping BvS_9i.mkv
-	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_9i.mkv" -o "docs\temp\BvS_9i_Cropped.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 50000 -2 --cfr -w 3840 -l 2160 --crop 214:214:380:380
+	set "stage_name=HandBrakeCLI: BvS_9i_Cropped.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_9i.mkv" -o "docs\temp\BvS_9i_Cropped.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 50000 -2 --cfr -w 3840 -l 2160 --crop 214:214:380:380 >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_9i_Cropped.mkv"
+	if errorlevel 1 goto stage_failed
 
-	echo Deleting BvS_9i.mkv
-	del "docs\temp\BvS_9i.mkv"
 
 
 	
-	::Deleting audioless source
-	echo Deleting BvS.mkv
-	del "docs\temp\BvS.mkv"
 
 
 
 	::Concatenating all 10 files
 	echo Exporting...
-	docs\programs\avidemux\avidemux_cli --load "docs\temp\BvS_1i_Cropped.mkv" --append "docs\temp\BvS_2s.mkv" --append "docs\temp\BvS_3i_Cropped.mkv" --append "docs\temp\BvS_4s.mkv" --append "docs\temp\BvS_5i_Cropped.mkv" --append "docs\temp\BvS_6s.mkv" --append "docs\temp\BvS_7i_Cropped.mkv" --append "docs\temp\BvS_8s.mkv" --append "docs\temp\BvS_9i_Cropped.mkv" --append "docs\temp\BvS_10s.mkv" --video-codec copy --audio-codec copy --output-format mkv --save "docs\temp\BvS_1.78.mkv"
+	set "stage_name=avidemux_cli: BvS_1.78.mkv"
+	call :require_stage_output "docs\temp\BvS_1i_Cropped.mkv"
+	if errorlevel 1 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_2s.mkv"
+	if errorlevel 1 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_3i_Cropped.mkv"
+	if errorlevel 1 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_4s.mkv"
+	if errorlevel 1 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_5i_Cropped.mkv"
+	if errorlevel 1 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_6s.mkv"
+	if errorlevel 1 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_7i_Cropped.mkv"
+	if errorlevel 1 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_8s.mkv"
+	if errorlevel 1 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_9i_Cropped.mkv"
+	if errorlevel 1 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_10s.mkv"
+	if errorlevel 1 goto stage_failed
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\avidemux\avidemux_cli --load "docs\temp\BvS_1i_Cropped.mkv" --append "docs\temp\BvS_2s.mkv" --append "docs\temp\BvS_3i_Cropped.mkv" --append "docs\temp\BvS_4s.mkv" --append "docs\temp\BvS_5i_Cropped.mkv" --append "docs\temp\BvS_6s.mkv" --append "docs\temp\BvS_7i_Cropped.mkv" --append "docs\temp\BvS_8s.mkv" --append "docs\temp\BvS_9i_Cropped.mkv" --append "docs\temp\BvS_10s.mkv" --video-codec copy --audio-codec copy --output-format mkv --save "docs\temp\BvS_1.78.mkv" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_1.78.mkv"
+	if errorlevel 1 goto stage_failed
 
 
 
-	::Deleting 10 split files
 	echo Deleting Leftover Files
-	del "docs\temp\BvS_1i_Cropped.mkv"
-	del "docs\temp\BvS_2s.mkv"
-	del "docs\temp\BvS_3i_Cropped.mkv"
-	del "docs\temp\BvS_4s.mkv"
-	del "docs\temp\BvS_5i_Cropped.mkv"
-	del "docs\temp\BvS_6s.mkv"
-	del "docs\temp\BvS_7i_Cropped.mkv"
-	del "docs\temp\BvS_8s.mkv"
-	del "docs\temp\BvS_9i_Cropped.mkv"
-	del "docs\temp\BvS_10s.mkv"
 
 
 
@@ -200,20 +307,24 @@ if %version%==1 (
 			docs\programs\mkvtoolnix\mkvmerge -o "!folder!\Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.78.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.78.mkv" -D --no-video "%file%" > "docs\temp\final-remux.log" 2>&1
 			if errorlevel 2 goto remux_failed
 			if errorlevel 1 goto remux_warning
+			if not errorlevel 0 goto remux_failed
 		) else if %dialog2%==n (
 			docs\programs\mkvtoolnix\mkvmerge -o "!result!" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.78.mkv" -D --no-video "%file%" > "docs\temp\final-remux.log" 2>&1
 			if errorlevel 2 goto remux_failed
 			if errorlevel 1 goto remux_warning
+			if not errorlevel 0 goto remux_failed
 		)
 	) else if %dialog%==n (
 		if %dialog2%==y (
 			docs\programs\mkvtoolnix\mkvmerge -o "!folder!\Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.78.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.78.mkv" -D --no-video !file! > "docs\temp\final-remux.log" 2>&1
 			if errorlevel 2 goto remux_failed
 			if errorlevel 1 goto remux_warning
+			if not errorlevel 0 goto remux_failed
 		) else if %dialog2%==n (
 			docs\programs\mkvtoolnix\mkvmerge -o "!result!" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.78.mkv" -D --no-video !file! > "docs\temp\final-remux.log" 2>&1
 			if errorlevel 2 goto remux_failed
 			if errorlevel 1 goto remux_warning
+			if not errorlevel 0 goto remux_failed
 		)
 	)
 	
@@ -222,9 +333,6 @@ if %version%==1 (
 
 	endlocal
 	
-	::Deleting altered video with incorrect non-video tracks
-	echo Deleting BvS_1.78.mkv
-	del "docs\temp\BvS_1.78.mkv"
 
 
 ) else if %version%==2 (
@@ -235,96 +343,203 @@ if %version%==1 (
 	PAUSE
 
 	if %dialog%==y (
-		docs\programs\mkvtoolnix\mkvmerge -o "docs\temp\BvS.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "%file%"
+		set "stage_name=mkvmerge: BvS.mkv"
+		echo Stage: !stage_name!>> "docs\temp\processing.log"
+		docs\programs\mkvtoolnix\mkvmerge -o "docs\temp\BvS.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "%file%" >> "docs\temp\processing.log" 2>&1
+		if errorlevel 2 goto stage_failed
+		if errorlevel 1 goto stage_warning
+		if not errorlevel 0 goto stage_failed
+		call :require_stage_output "docs\temp\BvS.mkv"
+		if errorlevel 1 goto stage_failed
 	) else if %dialog%==n (
-		docs\programs\mkvtoolnix\mkvmerge -o "docs\temp\BvS.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags !file!
+		set "stage_name=mkvmerge: BvS.mkv"
+		echo Stage: !stage_name!>> "docs\temp\processing.log"
+		docs\programs\mkvtoolnix\mkvmerge -o "docs\temp\BvS.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags !file! >> "docs\temp\processing.log" 2>&1
+		if errorlevel 2 goto stage_failed
+		if errorlevel 1 goto stage_warning
+		if not errorlevel 0 goto stage_failed
+		call :require_stage_output "docs\temp\BvS.mkv"
+		if errorlevel 1 goto stage_failed
 	)
 
 	::Extracting 5 unaltered (IMAX) files
 	echo Spliting BvS_1i.mkv
-	docs\programs\ffmpeg\ffmpeg -threads 0 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 7388 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_1i.mkv"
+	set "stage_name=ffmpeg: BvS_1i.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\ffmpeg\ffmpeg -threads 0 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 7388 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_1i.mkv" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_1i.mkv"
+	if errorlevel 1 goto stage_failed
 
 	echo Spliting BvS_3i.mkv
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 01:04:51.470 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 6427 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_3i.mkv"
+	set "stage_name=ffmpeg: BvS_3i.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 01:04:51.470 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 6427 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_3i.mkv" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_3i.mkv"
+	if errorlevel 1 goto stage_failed
 
 	echo Spliting BvS_5i.mkv
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:02:58.190 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 10633 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_5i.mkv"
+	set "stage_name=ffmpeg: BvS_5i.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:02:58.190 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 10633 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_5i.mkv" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_5i.mkv"
+	if errorlevel 1 goto stage_failed
 
 	echo Spliting BvS_7i.mkv
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:41:18.377 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 13366 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_7i.mkv"
+	set "stage_name=ffmpeg: BvS_7i.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:41:18.377 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 13366 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_7i.mkv" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_7i.mkv"
+	if errorlevel 1 goto stage_failed
 
 	echo Spliting BvS_9i.mkv
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:53:29.482 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 1804 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_9i.mkv"
+	set "stage_name=ffmpeg: BvS_9i.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:53:29.482 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 1804 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_9i.mkv" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_9i.mkv"
+	if errorlevel 1 goto stage_failed
 
 
 
 	::Extracting, encoding(windowboxing) and deleting(original) for the 5 other files (scope)
 	echo Spliting BvS_2s.mkv
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 00:05:09.142 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 85890 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_2s.mkv"
+	set "stage_name=ffmpeg: BvS_2s.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 00:05:09.142 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 85890 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_2s.mkv" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_2s.mkv"
+	if errorlevel 1 goto stage_failed
 
 	echo Windowboxing BvS_2s.mkv
-	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_2s.mkv" -o "docs\temp\BvS_2s_Windowboxed.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 51400 --cfr -2 -w 3080 -l 1732 --crop-mode "none" --non-anamorphic --pad "width=3840:height=2160"
+	set "stage_name=HandBrakeCLI: BvS_2s_Windowboxed.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_2s.mkv" -o "docs\temp\BvS_2s_Windowboxed.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 51400 --cfr -2 -w 3080 -l 1732 --crop-mode "none" --non-anamorphic --pad "width=3840:height=2160" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_2s_Windowboxed.mkv"
+	if errorlevel 1 goto stage_failed
 
-	echo Deleting BvS_2s.mkv
-	del "docs\temp\BvS_2s.mkv"
 
 	echo Spliting BvS_4s.mkv
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 01:09:18.715 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 77191 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_4s.mkv"
+	set "stage_name=ffmpeg: BvS_4s.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 01:09:18.715 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 77191 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_4s.mkv" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_4s.mkv"
+	if errorlevel 1 goto stage_failed
 
 	echo Windowboxing BvS_4s.mkv
-	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_4s.mkv" -o "docs\temp\BvS_4s_Windowboxed.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 51700 --cfr -2 -w 3080 -l 1732 --crop-mode "none" --non-anamorphic --pad "width=3840:height=2160"
+	set "stage_name=HandBrakeCLI: BvS_4s_Windowboxed.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_4s.mkv" -o "docs\temp\BvS_4s_Windowboxed.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 51700 --cfr -2 -w 3080 -l 1732 --crop-mode "none" --non-anamorphic --pad "width=3840:height=2160" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_4s_Windowboxed.mkv"
+	if errorlevel 1 goto stage_failed
 
-	echo Deleting BvS_4s.mkv
-	del "docs\temp\BvS_4s.mkv"
 
 	echo Spliting BvS_6s.mkv
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:10:22.606 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 44494 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_6s.mkv"
+	set "stage_name=ffmpeg: BvS_6s.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:10:22.606 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 44494 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_6s.mkv" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_6s.mkv"
+	if errorlevel 1 goto stage_failed
 
 	echo Windowboxing BvS_6s.mkv
-	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_6s.mkv" -o "docs\temp\BvS_6s_Windowboxed.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 59500 --cfr -2 -w 3080 -l 1732 --crop-mode "none" --non-anamorphic --pad "width=3840:height=2160"
+	set "stage_name=HandBrakeCLI: BvS_6s_Windowboxed.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_6s.mkv" -o "docs\temp\BvS_6s_Windowboxed.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 59500 --cfr -2 -w 3080 -l 1732 --crop-mode "none" --non-anamorphic --pad "width=3840:height=2160" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_6s_Windowboxed.mkv"
+	if errorlevel 1 goto stage_failed
 
-	echo Deleting BvS_6s.mkv
-	del "docs\temp\BvS_6s.mkv"
 
 	echo Spliting BvS_8s.mkv
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:50:35.850 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 4163 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_8s.mkv"
+	set "stage_name=ffmpeg: BvS_8s.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:50:35.850 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 4163 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_8s.mkv" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_8s.mkv"
+	if errorlevel 1 goto stage_failed
 
 	echo Windowboxing BvS_8s.mkv
-	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_8s.mkv" -o "docs\temp\BvS_8s_Windowboxed.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 48900 --cfr -2 -w 3080 -l 1732 --crop-mode "none" --non-anamorphic --pad "width=3840:height=2160"
+	set "stage_name=HandBrakeCLI: BvS_8s_Windowboxed.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_8s.mkv" -o "docs\temp\BvS_8s_Windowboxed.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 48900 --cfr -2 -w 3080 -l 1732 --crop-mode "none" --non-anamorphic --pad "width=3840:height=2160" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_8s_Windowboxed.mkv"
+	if errorlevel 1 goto stage_failed
 
-	echo Deleting BvS_8s.mkv
-	del "docs\temp\BvS_8s.mkv"
 
 	echo Spliting BvS_10s.mkv
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:54:43.862 -noaccurate_seek -i "docs\temp\BvS.mkv" -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_10s.mkv"
+	set "stage_name=ffmpeg: BvS_10s.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:54:43.862 -noaccurate_seek -i "docs\temp\BvS.mkv" -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_10s.mkv" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_10s.mkv"
+	if errorlevel 1 goto stage_failed
 
 	echo Windowboxing BvS_10s.mkv
-	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_10s.mkv" -o "docs\temp\BvS_10s_Windowboxed.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 30000 --cfr -2 -w 3080 -l 1732 --crop-mode "none" --non-anamorphic --pad "width=3840:height=2160"
+	set "stage_name=HandBrakeCLI: BvS_10s_Windowboxed.mkv"
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_10s.mkv" -o "docs\temp\BvS_10s_Windowboxed.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 30000 --cfr -2 -w 3080 -l 1732 --crop-mode "none" --non-anamorphic --pad "width=3840:height=2160" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_10s_Windowboxed.mkv"
+	if errorlevel 1 goto stage_failed
 
-	echo Deleting BvS_10s.mkv
-	del "docs\temp\BvS_10s.mkv"
 
-	echo Deleting BvS.mkv
-	del "docs\temp\BvS.mkv"
 
 	::Concatenating all 10 files
 	echo Exporting...
-	docs\programs\avidemux\avidemux_cli --load "docs\temp\BvS_1i.mkv" --append "docs\temp\BvS_2s_Windowboxed.mkv" --append "docs\temp\BvS_3i.mkv" --append "docs\temp\BvS_4s_Windowboxed.mkv" --append "docs\temp\BvS_5i.mkv" --append "docs\temp\BvS_6s_Windowboxed.mkv" --append "docs\temp\BvS_7i.mkv" --append "docs\temp\BvS_8s_Windowboxed.mkv" --append "docs\temp\BvS_9i.mkv" --append "docs\temp\BvS_10s_Windowboxed.mkv" --video-codec copy --audio-codec copy --output-format mkv --save "docs\temp\BvS_1.43.mkv"
+	set "stage_name=avidemux_cli: BvS_1.43.mkv"
+	call :require_stage_output "docs\temp\BvS_1i.mkv"
+	if errorlevel 1 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_2s_Windowboxed.mkv"
+	if errorlevel 1 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_3i.mkv"
+	if errorlevel 1 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_4s_Windowboxed.mkv"
+	if errorlevel 1 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_5i.mkv"
+	if errorlevel 1 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_6s_Windowboxed.mkv"
+	if errorlevel 1 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_7i.mkv"
+	if errorlevel 1 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_8s_Windowboxed.mkv"
+	if errorlevel 1 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_9i.mkv"
+	if errorlevel 1 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_10s_Windowboxed.mkv"
+	if errorlevel 1 goto stage_failed
+	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	docs\programs\avidemux\avidemux_cli --load "docs\temp\BvS_1i.mkv" --append "docs\temp\BvS_2s_Windowboxed.mkv" --append "docs\temp\BvS_3i.mkv" --append "docs\temp\BvS_4s_Windowboxed.mkv" --append "docs\temp\BvS_5i.mkv" --append "docs\temp\BvS_6s_Windowboxed.mkv" --append "docs\temp\BvS_7i.mkv" --append "docs\temp\BvS_8s_Windowboxed.mkv" --append "docs\temp\BvS_9i.mkv" --append "docs\temp\BvS_10s_Windowboxed.mkv" --video-codec copy --audio-codec copy --output-format mkv --save "docs\temp\BvS_1.43.mkv" >> "docs\temp\processing.log" 2>&1
+	if errorlevel 1 goto stage_failed
+	if not errorlevel 0 goto stage_failed
+	call :require_stage_output "docs\temp\BvS_1.43.mkv"
+	if errorlevel 1 goto stage_failed
 
 
 
-	::Deleting 10 split files
 	echo Deleting Leftover Files
-	del "docs\temp\BvS_1i.mkv"
-	del "docs\temp\BvS_2s_Windowboxed.mkv"
-	del "docs\temp\BvS_3i.mkv"
-	del "docs\temp\BvS_4s_Windowboxed.mkv"
-	del "docs\temp\BvS_5i.mkv"
-	del "docs\temp\BvS_6s_Windowboxed.mkv"
-	del "docs\temp\BvS_7i.mkv"
-	del "docs\temp\BvS_8s_Windowboxed.mkv"
-	del "docs\temp\BvS_9i.mkv"
-	del "docs\temp\BvS_10s_Windowboxed.mkv"
 
 
 
@@ -339,20 +554,24 @@ if %version%==1 (
 			docs\programs\mkvtoolnix\mkvmerge -o "!folder!\Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.43 (unmasked).mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.43.mkv" -D --no-video "%file%" > "docs\temp\final-remux.log" 2>&1
 			if errorlevel 2 goto remux_failed
 			if errorlevel 1 goto remux_warning
+			if not errorlevel 0 goto remux_failed
 		) else if %dialog2%==n (
 			docs\programs\mkvtoolnix\mkvmerge -o "!result!" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.43.mkv" -D --no-video "%file%" > "docs\temp\final-remux.log" 2>&1
 			if errorlevel 2 goto remux_failed
 			if errorlevel 1 goto remux_warning
+			if not errorlevel 0 goto remux_failed
 		)
 	) else if %dialog%==n (
 		if %dialog2%==y (
 			docs\programs\mkvtoolnix\mkvmerge -o "!folder!\Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.43 (unmasked).mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.43.mkv" -D --no-video !file! > "docs\temp\final-remux.log" 2>&1
 			if errorlevel 2 goto remux_failed
 			if errorlevel 1 goto remux_warning
+			if not errorlevel 0 goto remux_failed
 		) else if %dialog2%==n (
 			docs\programs\mkvtoolnix\mkvmerge -o "!result!" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.43.mkv" -D --no-video !file! > "docs\temp\final-remux.log" 2>&1
 			if errorlevel 2 goto remux_failed
 			if errorlevel 1 goto remux_warning
+			if not errorlevel 0 goto remux_failed
 		)
 	)
 
@@ -361,9 +580,6 @@ if %version%==1 (
 
 	endlocal
 	
-	::Deleting altered video with incorrect non-video tracks
-	echo Deleting BvS_1.43.mkv
-	del "docs\temp\BvS_1.43.mkv"
 	
 	
 ) else (
@@ -382,7 +598,8 @@ popd
 exit /b 0
 
 :cleanup_incomplete
-echo Restoration completed. Temporary files remain in "%~dp0docs\temp".
+echo An output was created; assembly completeness still needs review.
+echo Intermediate files and logs remain in "%~dp0docs\temp".
 echo Review or move them before starting another restoration.
 PAUSE
 popd
@@ -418,6 +635,10 @@ exit /b 0
 
 :cleanup_workspace
 setlocal DisableDelayedExpansion
+rem Avidemux may report success after incomplete assembly; retain evidence.
+if exist "docs\temp\processing.log" (
+    endlocal & exit /b 1
+)
 if exist "docs\temp\final-remux.log" del /q "docs\temp\final-remux.log"
 rem Nonrecursive removal preserves any unexpected files or subdirectories.
 rmdir "docs\temp" 2>nul
@@ -425,6 +646,30 @@ if exist "docs\temp" (
     endlocal & exit /b 1
 )
 endlocal & exit /b 0
+
+:: Structural output check only; does not qualify media contents.
+:require_stage_output
+setlocal DisableDelayedExpansion
+if not exist "%~1" (endlocal & exit /b 1)
+if exist "%~1\" (endlocal & exit /b 1)
+for %%F in ("%~1") do if %%~zF EQU 0 (endlocal & exit /b 1)
+endlocal & exit /b 0
+
+:stage_warning
+echo Processing stopped with a warning at !stage_name!.
+echo Intermediate files and diagnostics are retained in docs\temp.
+echo Review docs\temp\processing.log before moving the folder aside.
+PAUSE
+popd
+exit /b 1
+
+:stage_failed
+echo Processing failed at !stage_name!.
+echo Intermediate files and diagnostics are retained in docs\temp.
+echo Review docs\temp\processing.log before moving the folder aside.
+PAUSE
+popd
+exit /b 2
 
 :remux_warning
 echo Final remux completed with warnings. The output needs review.
