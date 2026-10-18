@@ -1,17 +1,8 @@
 @ECHO OFF
 
-cd "docs"
-if exist temp (
-	::Deleting temp files from previous failed session
-    cd "temp"
-	del *.* /F /Q
-	cd ..
-	cd ..
-) else (
-	::Creating temp folder
-	mkdir temp
-    cd ..
-)
+setlocal DisableDelayedExpansion
+call :prepare_workspace
+if errorlevel 1 exit /b 2
 
 ::Making sure batch file drive location has enough space
 echo Please make sure you have extracted the 7z zip file to a drive with 160GB of free space.
@@ -381,32 +372,74 @@ if %version%==1 (
 	goto a
 )
 
-::Deleting all files in temp
-echo Deleting any temp files before closing the session
-cd "docs\temp\"
-del *.* /F /Q
-
-::Deleting temp folder
-rmdir /s /q temp
-cd ..
-cd ..
+::Remove only the known log; unexpected work must survive cleanup.
+call :cleanup_workspace
+if errorlevel 1 goto cleanup_incomplete
 
 echo Done!
 PAUSE
+popd
 exit /b 0
+
+:cleanup_incomplete
+echo Restoration completed. Temporary files remain in "%~dp0docs\temp".
+echo Review or move them before starting another restoration.
+PAUSE
+popd
+exit /b 1
+
+:: Workspace helpers: shared structure in both film launchers.
+:prepare_workspace
+rem Caller owns environment scope; keep pushd active until the final popd.
+pushd "%~dp0"
+if errorlevel 1 (
+    echo Cannot open the restorer program folder. Processing has not started.
+    exit /b 2
+)
+if not exist "docs\" (
+    echo The docs folder is missing. Extract the complete application archive.
+    popd
+    exit /b 2
+)
+if exist "docs\temp" (
+    echo Temporary work already exists in "%~dp0docs\temp".
+    echo Preserve or move that folder before starting another restoration.
+    echo No existing temporary files have been deleted.
+    popd
+    exit /b 2
+)
+mkdir "docs\temp"
+if errorlevel 1 (
+    echo Cannot create the temporary workspace. Processing has not started.
+    popd
+    exit /b 2
+)
+exit /b 0
+
+:cleanup_workspace
+setlocal DisableDelayedExpansion
+if exist "docs\temp\final-remux.log" del /q "docs\temp\final-remux.log"
+rem Nonrecursive removal preserves any unexpected files or subdirectories.
+rmdir "docs\temp" 2>nul
+if exist "docs\temp" (
+    endlocal & exit /b 1
+)
+endlocal & exit /b 0
 
 :remux_warning
 echo Final remux completed with warnings. The output needs review.
 echo The assembled video is retained at docs\temp\BvS_1.78.mkv or docs\temp\BvS_1.43.mkv
 echo Details are in docs\temp\final-remux.log
-echo Do not restart this program yet: startup deletes retained temporary files.
+echo A new run will preserve this folder and stop until you move it aside.
 PAUSE
+popd
 exit /b 1
 
 :remux_failed
 echo Final remux failed. Any destination output may be incomplete; do not use it.
 echo The assembled video is retained at docs\temp\BvS_1.78.mkv or docs\temp\BvS_1.43.mkv
 echo Details are in docs\temp\final-remux.log
-echo Do not restart this program yet: startup deletes retained temporary files.
+echo A new run will preserve this folder and stop until you move it aside.
 PAUSE
+popd
 exit /b 2

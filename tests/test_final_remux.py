@@ -55,7 +55,7 @@ class SourceRegression(unittest.TestCase):
         self.assertNotRegex(handlers, r'(?im)^\s*(del|rmdir)\s')
         self.assertIn('exit /b 1', handlers)
         self.assertIn('exit /b 2', handlers)
-        self.assertIn('startup deletes retained temporary files', handlers)
+        self.assertIn('A new run will preserve this folder', handlers)
 
 
 @unittest.skipUnless(os.name == 'nt', 'requires actual Windows cmd.exe')
@@ -107,8 +107,8 @@ class WindowsRemux(unittest.TestCase):
                    STUB_NO_OUTPUT='1' if no_output else '0',
                    STUB_ARGS=str(root / 'args.txt'))
         handlers = ':remux_warning\n' + TEXT.split('\n:remux_warning\n', 1)[1]
-        harness = ('@echo off\nsetlocal\nsetlocal enabledelayedexpansion\n'
-                   + remux_blocks()[mode - 1] + '\necho Done!\nexit /b 0\n'
+        harness = ('@echo off\nsetlocal\npushd "%~dp0"\nsetlocal enabledelayedexpansion\n'
+                   + remux_blocks()[mode - 1] + '\necho Done!\npopd\nexit /b 0\n'
                    + handlers)
         # PAUSE is intentionally excluded from this noninteractive harness.
         harness = re.sub(r'(?im)^\s*PAUSE\s*$', 'rem PAUSE omitted by test harness', harness)
@@ -137,7 +137,7 @@ class WindowsRemux(unittest.TestCase):
                     self.assertEqual(output.name, 'Batman v Superman Dawn of Justice Ultimate Edition IMAX ' + expected + '.mkv')
                     self.assertIn('stub diagnostic', (root / 'docs/temp/final-remux.log').read_text())
                     if code:
-                        self.assertIn('Do not restart', result.stdout)
+                        self.assertIn('A new run will preserve', result.stdout)
 
     def test_missing_executable_and_empty_output_retain_intermediate(self):
         for missing, empty, no_output in ((True, False, False), (False, True, False),
