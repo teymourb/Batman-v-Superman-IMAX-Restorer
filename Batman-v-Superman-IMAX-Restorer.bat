@@ -390,6 +390,7 @@ exit /b 1
 
 :: Workspace helpers: shared structure in both film launchers.
 :prepare_workspace
+rem Caller owns environment scope; keep pushd active until the final popd.
 pushd "%~dp0"
 if errorlevel 1 (
     echo Cannot open the restorer program folder. Processing has not started.

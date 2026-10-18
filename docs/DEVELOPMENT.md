@@ -1,56 +1,72 @@
-# Development status
+# Development status — 2026-10-18
 
-## Final-remux safety, proposed 1.0.1
+## Current state and authorization
 
-Base: `79ae0c0ba8a8bea2e88648cf61ce4b3f14aebce3` (main / v1.0.0).
-Both 1.78 and 1.43 unmasked workflows now retain assembled video and
-`docs\temp\final-remux.log` after warnings, errors, missing tools or missing/empty
-output. MKVToolNix status 1 returns warning status 1; errors return status 2.
-No media command arguments changed.
+BvS remains a Windows batch utility. Original main/v1.0.0 was 79ae0c0; final-remux
+parity is merged via PR #1 at 79ba4ad. Proposed maintenance target: v1.0.1, not
+released. PR #2 introduces the same workspace helper structure as Asteroid City.
 
-`python3 -m unittest discover -s tests -v` on macOS: three source regressions
-passed; three Windows tests skipped. The Windows workflow exercises all eight
-mode/source/destination combinations against native executable exit statuses,
-missing tool and missing/empty output, plus a synthetic video/audio remux.
-It tests both the exact bundled MKVToolNix 78.0 executable and version 102.0.
-Final-remux parity was merged in PR #1 at `79ba4ad` after both Windows jobs
-passed: https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/actions/runs/39155612524.
+Both 1.78 and 1.43 unmasked modes retain assembled video and final-remux.log after
+warnings/errors, missing tools or absent/empty output. Warnings return status 1;
+errors return 2. No media-command arguments, cuts, transforms, encoder settings or
+successful output names changed.
 
-The harness bypasses dialogs, earlier processing and PAUSE. Full-film cuts,
-encoding, HDR, track/metadata preservation, synchronization and desktop dialogs
-remain unverified. Earlier stages retain legacy error handling.
+Startup checks the launcher folder/docs, refuses ANY existing docs/temp and checks
+creation before processing. A second run cannot acquire an existing workspace.
+Success cleanup removes only the known log and uses nonrecursive rmdir; unknown
+leftovers survive with a cleanup warning. Explicit exits restore caller cwd.
+Existing work survives restarts. There is no automatic resume.
 
-## Workspace safety follow-up
+prepare_workspace/cleanup_workspace and generic workspace tests are byte-identical
+to Asteroid City. This is the first shared structural refactor; film-specific
+processing commands remain explicit in each repository.
 
-Base: `79ba4ad87ec653f2540b8a8373da1f999c870c88` (merged final-remux parity).
-Launch now anchors execution to the script folder with checked `pushd`, requires
-`docs`, refuses any existing `docs/temp` and verifies workspace creation. Success
-removes only the known final-remux log and attempts nonrecursive directory
-removal; unexpected files/subdirectories remain. Success, warnings and errors
-restore the caller directory. Helpers and synthetic workspace tests share the
-Asteroid City structure, with film-specific processing kept unchanged.
+The owner approved the next maintenance/refactoring tasks, parallel work and the
+branch/PR/Windows-test/validated-merge workflow. Release downloads/tags, major
+architecture/dependency changes and private-media access need separate approval.
+No release archive, tool binary or private film is committed or uploaded.
 
-Local validation: four source regressions passed; eight Windows tests skipped on
-macOS. Windows CI is pending for this follow-up. New Windows cases launch from
-an unrelated directory, use installation paths containing spaces, `&` and `!`,
-check cwd during processing and after exit, preserve existing recovery work across
-repeated launches, reject missing docs/file-at-temp, preserve unknown leftovers,
-and refuse concurrent acquisition of an active workspace. No runtime tool version
-or restoration media command changed. A retained workspace needs manual review
-and relocation before a fresh run; this is not resume support.
+## Validation
 
-## Bundled-tool audit, 2026-10-18
+`python3 -m unittest discover -s tests -v` on macOS: four source checks PASS;
+eight Windows methods SKIP as intended. Python/C# are development-only tools.
 
-Public archive inspected:
+- Final-remux parity: all six methods passed in both exact-78.0/102.0 Windows jobs.
+  https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/actions/runs/39155612524
+- Workspace follow-up: all 12 methods pass with no skips in each real-tool stage,
+  using Windows Server 2022 and MKVToolNix 78.0/102.0:
+  https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/actions/runs/39156034272
+- Coverage: 32 remux branch/status cases, missing tool/output, both synthetic remux
+  modes preserving video packet hashes and PCM bytes; unrelated caller cwd and
+  sentinel files, missing docs, temp as file, repeated restarts retaining work,
+  simultaneous launch, unknown nested leftovers and success/warning/error exits.
+- Original media-command digest is unchanged; diff checks pass. Helpers and generic
+  workspace tests match Asteroid City exactly.
+
+Harnesses execute actual startup/remux/helper/exit sections but bypass dialogs,
+previous processing and PAUSE. Full-film cuts, encoding, HDR, track metadata,
+synchronization and Windows desktop dialogs are NOT qualified. General special-
+character source/destination paths, actual ACL/disk-full failure fixtures and
+full-stage error handling remain separate work. No private media used.
+
+## Bundled-tool audit
+
+Public v1.0.0 archive:
 https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/releases/download/v1.0.0/Batman-v-Superman-IMAX-Restorer_v1.0.0.7z
 
-- Release archive SHA256: `7f4701624ae87c21225e339b2caa65085ec7380a446b17bb155d04155ae4829a`.
-- Bundled `docs/programs/mkvtoolnix/mkvmerge.exe` SHA256:
-  `f707365fc6374db58c875d69fe8d3c3f572ab54369b28a863bc9aaad3ebc09ef`.
-- Executable bytes match the previously audited official 64-bit MKVToolNix 78.0
-  executable. Windows CI downloads the official 78.0 archive and checks both
-  its archive hash and executable hash before executing synthetic tests.
+- Archive SHA256: 7f4701624ae87c21225e339b2caa65085ec7380a446b17bb155d04155ae4829a.
+- Bundled mkvmerge.exe SHA256:
+  f707365fc6374db58c875d69fe8d3c3f572ab54369b28a863bc9aaad3ebc09ef.
+- Bytes match official 64-bit 78.0. CI checks archive and executable hashes.
 - Official archive SHA256:
-  `28aeb942e88b9bde8ad93b00020c9ab5289836bffd6df36582a6fd652cc7fdba`.
-- No Windows executable was run on macOS. No release artifacts or private film
-  files are committed; dependency licensing/repackaging is outside this patch.
+  28aeb942e88b9bde8ad93b00020c9ab5289836bffd6df36582a6fd652cc7fdba.
+- No Windows executable was run locally. Other dependency provenance/licensing
+  and a full release-package audit remain release-preparation work.
+
+## Next
+
+Add stage-level error handling before deleting inputs to preparation, extraction,
+encoding and assembly stages. Then simplify repeated input/remux branches while
+preserving command baselines. Introduce portable planning/profile code when there
+is a demonstrated shared need. Source fingerprint qualification is separate and
+synthetic-first; the reported BvS hash is not an implemented acceptance gate.
