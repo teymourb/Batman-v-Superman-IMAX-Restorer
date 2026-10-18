@@ -6,20 +6,38 @@ Base: `79ae0c0ba8a8bea2e88648cf61ce4b3f14aebce3` (main / v1.0.0).
 Both 1.78 and 1.43 unmasked workflows now retain assembled video and
 `docs\temp\final-remux.log` after warnings, errors, missing tools or missing/empty
 output. MKVToolNix status 1 returns warning status 1; errors return status 2.
-Success still follows existing cleanup. No media command arguments changed.
+No media command arguments changed.
 
 `python3 -m unittest discover -s tests -v` on macOS: three source regressions
 passed; three Windows tests skipped. The Windows workflow exercises all eight
 mode/source/destination combinations against native executable exit statuses,
 missing tool and missing/empty output, plus a synthetic video/audio remux.
 It tests both the exact bundled MKVToolNix 78.0 executable and version 102.0.
-Windows execution remains pending until the PR workflow runs.
+Final-remux parity was merged in PR #1 at `79ba4ad` after both Windows jobs
+passed: https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/actions/runs/39155612524.
 
 The harness bypasses dialogs, earlier processing and PAUSE. Full-film cuts,
 encoding, HDR, track/metadata preservation, synchronization and desktop dialogs
-remain unverified. Startup still deletes retained temporary files: do not restart
-a failed job before recovering its retained intermediate. Workspace cleanup is a
-separate follow-up; this patch deliberately does not change it.
+remain unverified. Earlier stages retain legacy error handling.
+
+## Workspace safety follow-up
+
+Base: `79ba4ad87ec653f2540b8a8373da1f999c870c88` (merged final-remux parity).
+Launch now anchors execution to the script folder with checked `pushd`, requires
+`docs`, refuses any existing `docs/temp` and verifies workspace creation. Success
+removes only the known final-remux log and attempts nonrecursive directory
+removal; unexpected files/subdirectories remain. Success, warnings and errors
+restore the caller directory. Helpers and synthetic workspace tests share the
+Asteroid City structure, with film-specific processing kept unchanged.
+
+Local validation: four source regressions passed; eight Windows tests skipped on
+macOS. Windows CI is pending for this follow-up. New Windows cases launch from
+an unrelated directory, use installation paths containing spaces, `&` and `!`,
+check cwd during processing and after exit, preserve existing recovery work across
+repeated launches, reject missing docs/file-at-temp, preserve unknown leftovers,
+and refuse concurrent acquisition of an active workspace. No runtime tool version
+or restoration media command changed. A retained workspace needs manual review
+and relocation before a fresh run; this is not resume support.
 
 ## Bundled-tool audit, 2026-10-18
 

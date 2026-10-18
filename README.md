@@ -109,3 +109,11 @@ On the 4K Blu-ray disc of BvS, the different types of scenes are encoded as foll
 [Reddit | r/fanedits Restoration thread](https://www.reddit.com/r/fanedits/comments/1637r5g/batman_v_superman_dawn_of_justice_ultimate/)  
 [Reddit | r/fanedits Program thread](https://www.reddit.com/r/fanedits/comments/171rpft/beta_testing_fanedit_program_batman_v_superman/)  
 [fanedit.org | Forums Restoration thread](https://forums.fanedit.org/threads/batman-v-superman-dawn-of-justice-ultimate-edition-imax-1-43-1-1-78-1-restorations-4k-uhd-hdr10.29021/)
+
+## Maintenance candidate: temporary work
+
+The proposed 1.0.1 keeps the assembled video and `docs/temp/final-remux.log`
+after final-remux warnings or errors. A new run preserves any existing `docs/temp`
+and stops. Move that folder somewhere safe before starting another restoration.
+Unexpected temporary files also survive successful cleanup. A destination file
+left after an error may be incomplete. Earlier-stage failure handling is unchanged.
