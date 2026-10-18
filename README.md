@@ -33,7 +33,7 @@ Choose between 2 **constant-width** IMAX Restorations:
 - Select your source rip .mkv file when prompted  
 - Select your destination folder for the output file  
 - If prompted to accept or decline a command towards the end of the encoding, enter y for yes
-- If the program is interrupted at any point or has failed, making sure to delete the *temp* folder in /docs/. This will be done automatically if the program is executed again.
+- In the 1.0.1 maintenance candidate, a new run preserves any existing `docs/temp` folder and stops. Move that folder somewhere safe before starting a new restoration. Published 1.0.0 still uses automatic startup cleanup: recover temporary work before restarting that version.
 
 <br>
 
