@@ -2,52 +2,71 @@
 
 ## Current state and authorization
 
-BvS remains a Windows batch utility. Original main/v1.0.0 was 79ae0c0; final-remux
-parity is merged via PR #1 at 79ba4ad. Proposed maintenance target: v1.0.1, not
-released. PR #2 introduces the same workspace helper structure as Asteroid City.
+BvS remains a Windows batch utility. Published v1.0.0 is unchanged; the proposed
+maintenance target is v1.0.1, not released. Stage-safety PR #4 merged at `3378431a`; validated source head is `0af524d`.
+Final-remux safeguards and workspace lifecycle improvements preceded this work.
+Both 1.78 and 1.43 unmasked modes retain the original media-command arguments,
+cuts, transforms, encoding settings and output names.
 
-Both 1.78 and 1.43 unmasked modes retain assembled video and final-remux.log after
-warnings/errors, missing tools or absent/empty output. Warnings return status 1;
-errors return 2. No media-command arguments, cuts, transforms, encoder settings or
-successful output names changed.
+Startup anchors execution to the launcher directory, requires docs, refuses any
+existing docs/temp and checks exclusive workspace creation. Existing work survives
+restarts and simultaneous launches. There is no automatic resume.
 
-Startup checks the launcher folder/docs, refuses ANY existing docs/temp and checks
-creation before processing. A second run cannot acquire an existing workspace.
-Success cleanup removes only the known log and uses nonrecursive rmdir; unknown
-leftovers survive with a cleanup warning. Explicit exits restore caller cwd.
-Existing work survives restarts. There is no automatic resume.
+Preparation, splitting, HandBrake encoding and Avidemux assembly stop on positive
+or negative process failures and reject missing/empty expected outputs. Assembly
+also checks each fixed load/append input before starting. MKVToolNix warning status
+1 stops for review; failures return 2. Stage markers and tool diagnostics go to
+processing.log; final-remux diagnostics go to final-remux.log in docs/temp.
 
-prepare_workspace/cleanup_workspace and generic workspace tests are byte-identical
-to Asteroid City. This is the first shared structural refactor; film-specific
-processing commands remain explicit in each repository.
+These are structural safeguards, not assembly completeness qualification. The
+bundled Avidemux 2.8.1 does not reliably propagate append/save errors to its exit
+status. All intermediates, assembly and logs therefore remain even after a final
+output is created. Completion returns warning 1 and requests manual review. This
+requires substantially more disk space: prepared video, raw splits, encoded
+splits, assembly and final output can coexist. After review, move the retained
+workspace somewhere safe before another run. Explicit exits restore caller cwd.
 
-The owner approved the next maintenance/refactoring tasks, parallel work and the
-branch/PR/Windows-test/validated-merge workflow. Release downloads/tags, major
-architecture/dependency changes and private-media access need separate approval.
-No release archive, tool binary or private film is committed or uploaded.
+Primary Avidemux 2.8.1 sources: [automation callbacks](https://raw.githubusercontent.com/mean00/avidemux2/2.8.1/avidemux/common/ADM_toolkit/automation.cpp)
+ignore append/save return values; [CLI UI_RunApp](https://raw.githubusercontent.com/mean00/avidemux2/2.8.1/avidemux/cli/ADM_userInterfaces/ADM_dialog/DIA_none.cpp)
+returns zero after automation. A zero exit plus a nonempty file cannot establish
+that all segments were appended successfully.
+
+Workspace and output-check helpers use the same structure as Asteroid City;
+film-specific commands remain explicit. The owner approved maintenance,
+refactoring, useful parallel work and the source-only branch/PR/Windows-test/
+validated-merge workflow. Release downloads/tags, major architecture/dependency
+changes and private-media access require separate approval. No release archive,
+processing binary, logo or private film is uploaded under this authorization.
 
 ## Validation
 
-`python3 -m unittest discover -s tests -v` on macOS: four source checks PASS;
-eight Windows methods SKIP as intended. Python/C# are development-only tools.
+`python3 -m unittest discover -s tests -v` on macOS: five static checks PASS;
+eleven Windows methods SKIP as intended. Python/C# are development-only tools.
+The original media-command digest and diff checks pass.
 
-- Final-remux parity: all six methods passed in both exact-78.0/102.0 Windows jobs.
-  https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/actions/runs/39155612524
-- Workspace follow-up: all 12 methods pass with no skips in each real-tool stage,
-  using Windows Server 2022 and MKVToolNix 78.0/102.0:
-  https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/actions/runs/39156034272
-- Coverage: 32 remux branch/status cases, missing tool/output, both synthetic remux
-  modes preserving video packet hashes and PCM bytes; unrelated caller cwd and
-  sentinel files, missing docs, temp as file, repeated restarts retaining work,
-  simultaneous launch, unknown nested leftovers and success/warning/error exits.
-- Original media-command digest is unchanged; diff checks pass. Helpers and generic
-  workspace tests match Asteroid City exactly.
+Windows stage-safety run for source head `0af524d`: **PASS**. All sixteen test
+methods passed with no skips in each real-tool stage, using Windows Server 2022
+and MKVToolNix 78.0/102.0:
+https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/actions/runs/39157671781
 
-Harnesses execute actual startup/remux/helper/exit sections but bypass dialogs,
-previous processing and PAUSE. Full-film cuts, encoding, HDR, track metadata,
-synchronization and Windows desktop dialogs are NOT qualified. General special-
-character source/destination paths, actual ACL/disk-full failure fixtures and
-full-stage error handling remain separate work. No private media used.
+Coverage includes whole production mode control flow with native synthetic tools:
+every pre-remux stage receives positive errors, negative crashes with partial
+outputs, or missing/empty outputs despite status zero. Tests check immediate stop
+and byte-identical retention of earlier work. Missing tools, preparation warnings
+and both manual/dialog source branches are exercised. The final-remux matrix has
+40 mode/source/destination/status cases, including negative process crashes.
+
+Existing synthetic real-tool remux tests compare video packet hashes and raw PCM
+sample bytes in both modes. Workspace tests cover unrelated caller directories,
+sentinel files, special-character installation paths, existing recovery work,
+concurrent launches and unknown leftovers. Earlier workspace Windows evidence:
+https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/actions/runs/39156034272
+
+Whole-mode tests replace tools with synthetic stubs and bypass dialogs/PAUSE;
+they do not qualify real Avidemux/HandBrake film processing. Full-film completeness,
+cuts, encoding quality, HDR, metadata, synchronization, Windows desktop dialogs,
+general special-character source/destination paths and actual ACL/disk-full
+fixtures remain unqualified. No private media is used.
 
 ## Bundled-tool audit
 
@@ -65,29 +84,13 @@ https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/releases/download/v1
 
 ## Next
 
-Add stage-level error handling before deleting inputs to preparation, extraction,
-encoding and assembly stages. Then simplify repeated input/remux branches while
-preserving command baselines. Introduce portable planning/profile code when there
-is a demonstrated shared need. Source fingerprint qualification is separate and
-synthetic-first; the reported BvS hash is not an implemented acceptance gate.
+Independently qualify assembly completeness before restoring automatic deletion.
+Review retained outputs manually when real-film qualification becomes necessary;
+private media needs task-specific consent. Resolve release-package provenance,
+source/license documentation and any asset redistribution questions before
+preparing a current candidate and requesting release approval.
 
-## Stage-safety branch (not yet Windows-qualified)
-
-Preparation, splitting, HandBrake encoding and Avidemux assembly have immediate
-positive/negative exit gates, fixed-path nonempty output checks and processing.log
-stage diagnostics. Assembly requires every fixed load/append input first. Media
-arguments remain byte-identical to the original command baseline. Final remux
-also rejects negative process exit codes.
-
-Avidemux 2.8.1 does not reliably propagate append/save failures, so these checks
-are structural guards, not completeness qualification. All intermediate inputs,
-assembly and logs remain even after output creation; production completion returns
-warning 1 and asks for review. This intentionally increases peak disk usage.
-Independent assembly completeness qualification is needed before automatic cleanup
-can safely return. No automatic resume and no private-media access.
-
-New native stub tests execute entire production mode control flow while bypassing
-only dialogs/PAUSE. They inject positive errors, negative crashes with partial
-outputs, missing/empty successful outputs at every pre-remux stage, missing tools
-and MKVToolNix preparation warnings. macOS: five static checks pass; eleven Windows
-methods skip. Actual Windows evidence remains required before merging this branch.
+Then simplify repeated input/remux branches while preserving command baselines.
+Introduce portable planning/profile code when a demonstrated shared need supports
+it. Source-fingerprint qualification remains separate and synthetic-first; the
+reported BvS hash is not an implemented acceptance gate.
