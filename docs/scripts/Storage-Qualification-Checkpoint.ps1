@@ -11,7 +11,7 @@ $reserve = 20GB
 $names = @('BvS_1i_Cropped.mkv','BvS_2s.mkv','BvS_3i_Cropped.mkv','BvS_4s.mkv','BvS_5i_Cropped.mkv','BvS_6s.mkv','BvS_7i_Cropped.mkv','BvS_8s.mkv','BvS_9i_Cropped.mkv','BvS_10s.mkv')
 function Safe-Path([string]$path, [bool]$file) {
     $item = Get-Item -LiteralPath $path -Force
-    if ($file -and (($item -isnot [IO.FileInfo]) -or $item.Length -le 0)) { throw "Not a nonempty regular file: $path" }
+    if ($file -and (($item -isnot [IO.FileInfo]) -or $item.Length -le 0)) { throw "Not a nonempty regular file: $path; nativeExists=$([IO.File]::Exists($path)); type=$(@($item | ForEach-Object {$_.GetType().FullName}) -join ","); bytes=$(@($item | ForEach-Object {if ($_ -is [IO.FileInfo]) {$_.Length}}) -join ",")" }
     $ancestor = $item
     while ($null -ne $ancestor) {
         if (($ancestor.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw "Linked paths are unsupported: $path" }

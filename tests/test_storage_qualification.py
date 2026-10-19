@@ -70,7 +70,7 @@ class StorageWindows(unittest.TestCase):
             helper=helper.replace("function Read-Host { param($Prompt) 'SECOND_NO' }", "function Read-Host { param($Prompt) if ($Phase -eq 'BeforeRemux') { 'NO' } else { 'REMOVE' } }")
         if not missing_helper:
             (scripts/'Storage-Qualification-Checkpoint.ps1').write_text(helper)
-        (scripts/'Validate-Assembly.ps1').write_text("$work = Join-Path (Get-Location).Path 'docs/temp/assembly-validation-1.78'\n[IO.Directory]::CreateDirectory($work) | Out-Null\n[IO.File]::WriteAllText((Join-Path $work 'result.txt'), '"+('PASS: 1 decoded video frames match ordered inputs.' if validator==0 else 'FAIL: synthetic validator')+"')\nexit "+str(validator))
+        (scripts/'Validate-Assembly.ps1').write_text("$ErrorActionPreference = 'Stop'\n$work = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../temp/assembly-validation-1.78'))\n[IO.Directory]::CreateDirectory($work) | Out-Null\n[IO.File]::WriteAllText((Join-Path $work 'result.txt'), '"+('PASS: 1 decoded video frames match ordered inputs.' if validator==0 else 'FAIL: synthetic validator')+"')\nexit "+str(validator))
         source=root/'source.mkv'; source.write_bytes(b'original source sentinel')
         env=os.environ.copy(); env.update(version=str(mode),dialog='y',dialog2='y',file=str(source),folder=str(root),STAGE_TRACE=str(root/'trace'),STAGE_FAIL_AT=str(fail),STAGE_CODE='2',STAGE_ACTION='normal')
         start = 'if not exist \"docs\\scripts\\Storage-Qualification-Checkpoint.ps1\" (' if missing_helper else 'if not \"%version%\"==\"1\" ('
@@ -85,6 +85,9 @@ class StorageWindows(unittest.TestCase):
             root=Path(directory); env,source=self.setup_case(root,**kwargs)
             result=subprocess.run(['cmd.exe','/d','/c','run.bat'],cwd=root,env=env,capture_output=True,text=True,timeout=90)
             self.assertEqual(source.read_bytes(),b'original source sentinel')
+            if result.returncode != 1:
+                diagnostic=root/'docs/temp/processing.log'
+                if diagnostic.exists(): result.stderr += '\nPROCESSING LOG:\n'+diagnostic.read_text(errors='replace')
             names={p.name for p in (root/'docs/temp').iterdir()}
             trace=(root/'trace').read_text().splitlines() if (root/'trace').exists() else []
             log=(root/'docs/temp/storage-qualification.log').read_text(encoding='utf-8-sig') if (root/'docs/temp/storage-qualification.log').exists() else ''
