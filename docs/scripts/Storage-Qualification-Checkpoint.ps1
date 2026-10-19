@@ -11,7 +11,7 @@ $reserve = 20GB
 $names = @('BvS_1i_Cropped.mkv','BvS_2s.mkv','BvS_3i_Cropped.mkv','BvS_4s.mkv','BvS_5i_Cropped.mkv','BvS_6s.mkv','BvS_7i_Cropped.mkv','BvS_8s.mkv','BvS_9i_Cropped.mkv','BvS_10s.mkv')
 function Safe-Path([string]$path, [bool]$file) {
     $item = Get-Item -LiteralPath $path -Force
-    if ($file -and ($item.PSIsContainer -or $item.Length -le 0)) { throw "Not a nonempty regular file: $path" }
+    if ($file -and (($item -isnot [IO.FileInfo]) -or $item.Length -le 0)) { throw "Not a nonempty regular file: $path" }
     $ancestor = $item
     while ($null -ne $ancestor) {
         if (($ancestor.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw "Linked paths are unsupported: $path" }
@@ -30,7 +30,7 @@ function Record([string]$message) {
 }
 try {
     $null = Safe-Path $temp $false
-    if (!(Get-Item -LiteralPath $temp).PSIsContainer) { throw 'Workspace is not a directory.' }
+    if ((Get-Item -LiteralPath $temp) -isnot [IO.DirectoryInfo]) { throw 'Workspace is not a directory.' }
     if ($Phase -eq 'Preflight') {
         if (Test-Path -LiteralPath $statePath) { throw 'Qualification state already exists; preserve it.' }
         if (Test-Path -LiteralPath $log) { throw 'Qualification log already exists; preserve it.' }
