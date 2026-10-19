@@ -66,10 +66,22 @@ jobs:
             throw 'mkvmerge.exe differs from the audited release binary'
           }
           "RESTORER_REAL_MKVMERGE=$($mkvmerge.FullName)" >> $env:GITHUB_ENV
-          # Test-only, versioned community package containing the Gyan Windows build.
-          # No processing tools are installed on the developer's Mac or repackaged.
-          choco install ffmpeg --version=7.1.1 --yes --no-progress --allow-downgrade
-          if ($LASTEXITCODE -ne 0) { throw 'FFmpeg fixture tool installation failed' }
+          # Test-only Gyan 7.1.1 essentials; checksum from Microsoft's WinGet manifest:
+          # manifests/g/Gyan/FFmpeg/Essentials/7.1.1/Gyan.FFmpeg.Essentials.installer.yaml
+          $fixtureArchive = Join-Path $env:RUNNER_TEMP 'ffmpeg-7.1.1-essentials.zip'
+          Invoke-WebRequest 'https://github.com/GyanD/codexffmpeg/releases/download/7.1.1/ffmpeg-7.1.1-essentials_build.zip' -OutFile $fixtureArchive
+          if ((Get-FileHash $fixtureArchive -Algorithm SHA256).Hash.ToLowerInvariant() -ne '04861d3339c5ebe38b56c19a15cf2c0cc97f5de4fa8910e4d47e5e6404e4a2d4') {
+            throw 'FFmpeg fixture archive checksum mismatch'
+          }
+          $fixtureDir = Join-Path $env:RUNNER_TEMP 'fixture-ffmpeg'
+          7z x $fixtureArchive "-o$fixtureDir" 'ffmpeg-7.1.1-essentials_build/bin/*' -y
+          if ($LASTEXITCODE -ne 0) { throw 'FFmpeg fixture extraction failed' }
+          $fixtureBin = Join-Path $fixtureDir 'ffmpeg-7.1.1-essentials_build/bin'
+          foreach ($tool in @('ffmpeg.exe', 'ffprobe.exe')) {
+            if (-not (Test-Path (Join-Path $fixtureBin $tool) -PathType Leaf)) { throw "$tool fixture missing" }
+          }
+          $fixtureBin >> $env:GITHUB_PATH
+          "RESTORER_FIXTURE_BIN=$fixtureBin" >> $env:GITHUB_ENV
       - name: Prepare checksum-verified historical assembly tools
         shell: pwsh
         run: |
@@ -100,7 +112,13 @@ jobs:
         shell: pwsh
         run: |
           & $env:RESTORER_REAL_MKVMERGE --version
-          ffmpeg -version
-          ffprobe -version
+          if ($LASTEXITCODE -ne 0) { throw 'mkvmerge failed to launch' }
+          foreach ($tool in @('ffmpeg', 'ffprobe')) {
+            $expectedTool = Join-Path $env:RESTORER_FIXTURE_BIN "$tool.exe"
+            $resolvedTool = (Get-Command $tool -CommandType Application).Source
+            if ($resolvedTool -ine $expectedTool) { throw "$tool resolved outside verified fixture directory: $resolvedTool" }
+            & $resolvedTool -version
+            if ($LASTEXITCODE -ne 0) { throw "$tool fixture failed to launch" }
+          }
           python -m unittest discover -s tests -v
           if ($LASTEXITCODE -ne 0) { throw 'Synthetic remux test failed' }
