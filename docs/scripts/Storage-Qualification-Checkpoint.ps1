@@ -62,7 +62,6 @@ try {
         if ($encodedBytes -gt 14GB) { throw 'Encoded sections exceed planned budget; retain everything for review.' }
         $remove = @(Safe-Path (Join-Path $temp 'BvS.mkv') $true)
         $required = ($inputs | Measure-Object Length -Sum).Sum + $reserve
-        $expected = 'Preflight'
     } else {
         if ($state.Phase -ne 'BeforeAssembly') { throw 'Unexpected checkpoint order.' }
         $assembly = Safe-Path $assembled $true
@@ -72,7 +71,6 @@ try {
         $remove = @(@('BvS_2s.mkv','BvS_4s.mkv','BvS_6s.mkv','BvS_8s.mkv','BvS_10s.mkv') | ForEach-Object { Safe-Path (Join-Path $temp $_) $true })
         # Source size conservatively covers audio/subtitle/container addition.
         $required = $assembly.Length + $source.Length + $reserve
-        $expected = 'BeforeAssembly'
     }
     $reclaimed = ($remove | Measure-Object Length -Sum).Sum
     Record "$Phase free bytes=$(Free-Bytes); removable bytes=$reclaimed; required next-stage budget=$required."
