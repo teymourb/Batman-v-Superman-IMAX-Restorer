@@ -102,3 +102,29 @@ class RealAssembly(unittest.TestCase):
             self.assemble(clips, output)
             result, _ = self.validate(root, clips, output, 'open-gop')
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_existing_copy_split_pattern_at_later_gop_boundaries(self):
+        # Exercise the launchers' seek/copy pattern, rather than only complete
+        # clips beginning at their initial IDR. These remain synthetic timings.
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            source = root / 'source.mkv'
+            result = self.command([FFMPEG, '-nostdin', '-v', 'error', '-f', 'lavfi',
+                '-i', 'testsrc2=s=128x72:r=24:d=3', '-an', '-c:v', 'libx265',
+                '-pix_fmt', 'yuv420p10le', '-x265-params',
+                'pools=1:frame-threads=1:keyint=12:min-keyint=12:scenecut=0:open-gop=1',
+                '-y', source])
+            self.assertEqual(result.returncode, 0, result.stderr)
+            pieces = []
+            for index, seek in enumerate(('00:00:00.500', '00:00:01.500')):
+                piece = root / ('split-%d.mkv' % index)
+                result = self.command([FFMPEG, '-threads', '0', '-ss', seek,
+                    '-noaccurate_seek', '-i', source, '-vframes', '12', '-c:v',
+                    'copy', '-map', 'v:0', '-map_chapters', '-1', '-map_metadata',
+                    '-1', '-y', piece])
+                self.assertEqual(result.returncode, 0, result.stderr)
+                pieces.append(piece)
+            output = root / 'split-assembly.mkv'
+            self.assemble(pieces, output)
+            result, _ = self.validate(root, pieces, output, 'later-gop')
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
