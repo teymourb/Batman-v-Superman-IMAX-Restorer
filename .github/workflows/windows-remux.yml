@@ -5,6 +5,7 @@ on:
     paths:
       - 'Batman-v-Superman-IMAX-Restorer.bat'
       - 'tests/**'
+      - 'tools/**'
       - 'docs/scripts/**'
       - '.github/workflows/windows-remux.yml'
   workflow_dispatch:
@@ -37,6 +38,7 @@ jobs:
           sparse-checkout: |
             /Batman-v-Superman-IMAX-Restorer.bat
             /tests/
+            /tools/
             /docs/scripts/
       - name: Run batch regression matrix with native executable stub
         shell: pwsh
