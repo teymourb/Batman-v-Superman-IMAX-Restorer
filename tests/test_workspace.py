@@ -9,7 +9,9 @@ import unittest
 
 from test_final_remux import TEXT
 
-STARTUP = TEXT.split('::Making sure', 1)[0]
+# Exercise workspace functions independently of interactive selection.
+STARTUP = '@echo off\nsetlocal DisableDelayedExpansion\n' + TEXT.split('call :prepare_workspace', 1)[1].split('::Making sure', 1)[0]
+STARTUP = STARTUP.replace('if errorlevel 1 exit /b 2', 'call :prepare_workspace\nif errorlevel 1 exit /b 2', 1)
 SUCCESS = TEXT.split('::Remove only the known log;', 1)[1].split(
     ':: Workspace helpers:', 1)[0]
 HELPERS = TEXT.split(':: Workspace helpers:', 1)[1].split('\n:remux_warning', 1)[0]

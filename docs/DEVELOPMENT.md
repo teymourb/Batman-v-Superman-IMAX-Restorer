@@ -122,3 +122,28 @@ release approval. Then simplify repeated input/remux branches while preserving
 command baselines. Introduce portable planning/profile code when demonstrated
 shared needs support it. Source-fingerprint qualification remains separate; the
 reported BvS hash is not an implemented acceptance gate.
+
+## Unreleased interaction revision
+
+Selection now uses Windows PowerShell 5.1 STA WinForms dialogs and explicit manual
+fallback. Cancel/quit returns 3 without creating docs/temp; invalid selection
+returns 2. Setup validates a nonempty MKV, existing destination, mode, existing
+output and preserved workspace before confirmation. This is a file/path check,
+not proof of the required source fingerprint or adequate disk capacity.
+The confirmed child launcher receives Unicode environment values without a
+codepage-dependent configuration file or generated command script. Selected
+entry revalidates environment before workspace creation. Spaces, Unicode,
+ampersands and parentheses are supported; !, %, caret, embedded quotes and control
+characters are rejected with an actionable message because inherited batch
+processing is not safe for those paths. No processing command arguments changed.
+Visible stage names accompany detailed redirected logs. Full dialogue appearance
+and desktop cancellation still require hands-on Windows qualification.
+
+The storage-builder's baseline is now an explicitly historical fixture in
+`tests/fixtures/storage-qualification-baseline.bat`, checksum pinned to the
+reviewed owner-run kit. Rebuilding it reproduces the existing qualification run;
+it does not silently incorporate this revised interaction flow. Do not update an
+owner's running installation. A future storage launcher requires its own review.
+Existing output is checked again immediately before final remux, preserving a
+file created while encoding was running. This is not an atomic filesystem lock
+against an unrelated process creating the same path at the exact tool launch.

@@ -132,3 +132,15 @@ raw splits, encoded splits, assembly and final output can coexist. There is no
 automatic resume. A new run stops if `docs/temp` already exists; after reviewing
 the output, move that folder somewhere safe before another restoration. A file
 left after a failure may be incomplete. Published 1.0.0 is unchanged.
+
+### Unreleased setup improvements
+
+Start the BAT normally and follow source, output-folder and mode selection.
+Dialogs can be cancelled; choose manual entry or quit without starting processing.
+Pasted full paths may include surrounding quotes. Confirm the final summary to
+start. Existing outputs and workspaces are preserved. This batch version rejects
+paths containing `!`, `%`, `^`, embedded quotes or control characters; move/rename
+the program or input location if necessary. Spaces, Unicode, `&` and parentheses
+are supported. Keep the window open while processing; stage names appear there
+and detailed tool diagnostics go to `docs/temp/processing.log`. Do not restart or
+delete completed encodes after a failure: preserve logs and work for diagnosis.
