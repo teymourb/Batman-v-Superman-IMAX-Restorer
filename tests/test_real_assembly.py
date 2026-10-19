@@ -103,28 +103,46 @@ class RealAssembly(unittest.TestCase):
             result, _ = self.validate(root, clips, output, 'open-gop')
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
-    def test_existing_copy_split_pattern_at_later_gop_boundaries(self):
-        # Exercise the launchers' seek/copy pattern, rather than only complete
-        # clips beginning at their initial IDR. These remain synthetic timings.
-        with tempfile.TemporaryDirectory() as td:
-            root = Path(td)
-            source = root / 'source.mkv'
-            result = self.command([FFMPEG, '-nostdin', '-v', 'error', '-f', 'lavfi',
-                '-i', 'testsrc2=s=128x72:r=24:d=3', '-an', '-c:v', 'libx265',
-                '-pix_fmt', 'yuv420p10le', '-x265-params',
-                'pools=1:frame-threads=1:keyint=12:min-keyint=12:scenecut=0:open-gop=1',
-                '-y', source])
-            self.assertEqual(result.returncode, 0, result.stderr)
-            pieces = []
-            for index, seek in enumerate(('00:00:00.500', '00:00:01.500')):
-                piece = root / ('split-%d.mkv' % index)
-                result = self.command([FFMPEG, '-threads', '0', '-ss', seek,
-                    '-noaccurate_seek', '-i', source, '-vframes', '12', '-c:v',
-                    'copy', '-map', 'v:0', '-map_chapters', '-1', '-map_metadata',
-                    '-1', '-y', piece])
+    def test_copy_split_pattern_accepts_closed_gop_and_rejects_broken_open_gop(self):
+        # Same seek/copy pattern as the launchers. The deliberately open-GOP
+        # fixture loses reference pictures; independently establish that damage
+        # before expecting the gate to reject it. Do not relax decoder checks.
+        for open_gop in (False, True):
+            with self.subTest(open_gop=open_gop), tempfile.TemporaryDirectory() as td:
+                root = Path(td)
+                source = root / 'source.mkv'
+                result = self.command([FFMPEG, '-nostdin', '-v', 'error', '-f', 'lavfi',
+                    '-i', 'testsrc2=s=128x72:r=24:d=3', '-an', '-c:v', 'libx265',
+                    '-pix_fmt', 'yuv420p10le', '-x265-params',
+                    'pools=1:frame-threads=1:keyint=12:min-keyint=12:scenecut=0:open-gop=%d' % open_gop,
+                    '-y', source])
                 self.assertEqual(result.returncode, 0, result.stderr)
-                pieces.append(piece)
-            output = root / 'split-assembly.mkv'
-            self.assemble(pieces, output)
-            result, _ = self.validate(root, pieces, output, 'later-gop')
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                pieces = []
+                for index, seek in enumerate(('00:00:00.500', '00:00:01.500')):
+                    piece = root / ('split-%d.mkv' % index)
+                    result = self.command([FFMPEG, '-threads', '0', '-ss', seek,
+                        '-noaccurate_seek', '-i', source, '-vframes', '12', '-c:v',
+                        'copy', '-map', 'v:0', '-map_chapters', '-1', '-map_metadata',
+                        '-1', '-y', piece])
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    pieces.append(piece)
+                output = root / 'split-assembly.mkv'
+                self.assemble(pieces, output)
+                # Separate decoder-to-null invocation: no framehash parser/muxer.
+                decode = self.command([FFMPEG, '-nostdin', '-v', 'error', '-xerror',
+                    '-err_detect', 'explode', '-i', output, '-map', '0:v:0', '-an',
+                    '-f', 'null', '-'])
+                if open_gop:
+                    self.assertIn('Could not find ref with POC', decode.stderr)
+                else:
+                    self.assertEqual(decode.returncode, 0, decode.stderr)
+                    self.assertEqual(decode.stderr.strip(), '')
+                result, work = self.validate(root, pieces, output, 'later-gop')
+                diagnostics = []
+                if result.returncode:
+                    for log in work.glob('*.stderr.log'):
+                        errors = [line for line in log.read_text(errors='replace').splitlines()
+                                  if any(level in line for level in ('[error]', '[fatal]', '[panic]'))]
+                        diagnostics += [log.name] + errors[:12]
+                self.assertEqual(result.returncode, 2 if open_gop else 0,
+                                 result.stdout + result.stderr + '\n'.join(diagnostics))
