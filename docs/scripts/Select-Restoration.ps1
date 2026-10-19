@@ -29,6 +29,17 @@ function Get-PathValue([string]$Value) {
     if (-not [IO.Path]::IsPathRooted($value)) { throw 'Enter a full absolute path, including its drive.' }
     return [IO.Path]::GetFullPath($value)
 }
+function Show-AvailableSpace([string]$Label, [string]$Path) {
+    try {
+        $driveRoot = [IO.Path]::GetPathRoot($Path)
+        if ($driveRoot.StartsWith('\\')) { throw 'Network share space is not available through DriveInfo.' }
+        $drive = New-Object IO.DriveInfo($driveRoot)
+        $freeGiB = $drive.AvailableFreeSpace / 1GB
+        Write-Host ('Available space ({0}): {1:N1} GiB on {2}' -f $Label, $freeGiB, $driveRoot)
+    } catch {
+        Write-Host ('Available space ({0}): unavailable; check this location in File Explorer.' -f $Label)
+    }
+}
 function Check-Selection {
     $script:Source = Get-PathValue $Source
     $script:Destination = Get-PathValue $Destination
@@ -125,6 +136,17 @@ try {
     }
     Write-Host "Mode: $Mode - $modeName"
     Write-Host "Working files: $(Join-Path $root 'docs\temp')"
+    $sourceBytes = (Get-Item -LiteralPath $Source).Length
+    Write-Host ('Source size: {0:N2} GiB ({1} bytes); metadata only.' -f ($sourceBytes / 1GB), $sourceBytes)
+    Show-AvailableSpace 'working drive' $root
+    Show-AvailableSpace 'destination drive' $Destination
+    if ([string]::Equals([IO.Path]::GetPathRoot($root), [IO.Path]::GetPathRoot($Destination), [StringComparison]::OrdinalIgnoreCase)) {
+        Write-Host 'Working files and final output share the same free-space pool; do not add the two figures.'
+    } else {
+        Write-Host 'Working files and final output use separate drive locations.'
+    }
+    Write-Host 'Peak space for this keep-all workflow is not measured. These figures are not a guarantee that the run will fit.'
+
     Write-Host 'All intermediate videos and logs are retained. Several film-sized files may coexist.'
     Write-Host 'Encoding and independent assembly decoding can take hours. Do not restart after a failure.'
     while ($true) {

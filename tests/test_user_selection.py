@@ -129,6 +129,10 @@ class WindowsSelection(unittest.TestCase):
                 self.assertTrue((destination / name).is_file(), result.stdout + result.stderr)
                 self.assertEqual(source.read_bytes(), b'synthetic original')
                 self.assertIn('independent assembly validation passed', result.stdout)
+                self.assertIn('Source size:', result.stdout)
+                self.assertIn('Available space (working drive):', result.stdout)
+                self.assertIn('Available space (destination drive):', result.stdout)
+                self.assertIn('share the same free-space pool', result.stdout)
                 self.assertTrue((install / 'docs/temp/processing.log').exists())
 
     def test_quit_and_invalid_confirmation_do_not_create_workspace(self):
