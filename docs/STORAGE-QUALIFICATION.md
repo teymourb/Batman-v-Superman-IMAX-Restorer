@@ -98,8 +98,8 @@ Use Python 3 in a source checkout; the owner does not need Python for the run:
 python3 tools/build_storage_qualification.py --output /new/path/BvS-Storage-Qualification.bat
 ```
 
-The destination must not exist. The builder verifies the exact reviewed
-production launcher SHA256, checks insertion anchors, verifies every original
+The destination must not exist. The builder verifies the reviewed
+production launcher SHA256 after line-ending normalization, checks insertion anchors, verifies every original
 media-command line remains unchanged, and emits CRLF. The helper's interface is
 `-Phase Preflight`, `-Phase BeforeAssembly` or `-Phase BeforeRemux`; it receives source/destination
 variables through the inherited process environment, not expanded command-line

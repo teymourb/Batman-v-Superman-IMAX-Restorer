@@ -32,6 +32,11 @@ class StorageSource(unittest.TestCase):
         self.assertLess(second, text.index('docs\\programs\\mkvtoolnix\\mkvmerge -o "!folder!'))
         self.assertIn('-Phase Preflight', text)
 
+    def test_windows_checkout_line_endings_are_equivalent(self):
+        variant()
+        source=(ROOT/'Batman-v-Superman-IMAX-Restorer.bat').read_bytes().replace(b'\r\n',b'\n')
+        self.assertEqual(BUILDER.build(source),BUILDER.build(source.replace(b'\n',b'\r\n')))
+
     def test_changed_baseline_is_rejected(self):
         variant()
         with self.assertRaises(ValueError):

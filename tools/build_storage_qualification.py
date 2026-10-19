@@ -18,7 +18,7 @@ def media_commands(text):
 
 
 def build(source):
-    if hashlib.sha256(source).hexdigest() != BASELINE_SHA256:
+    if hashlib.sha256(source.replace(b"\r\n", b"\n")).hexdigest() != BASELINE_SHA256:
         raise ValueError("Production launcher differs from the reviewed baseline; review builder anchors first.")
     original = source.decode("utf-8").replace("\r\n", "\n")
     text = original
