@@ -5,7 +5,9 @@ call :prepare_workspace
 if errorlevel 1 exit /b 2
 
 ::Making sure batch file drive location has enough space
-echo Please make sure you have extracted the 7z zip file to a drive with 160GB of free space.
+echo This maintenance version retains all temporary videos and logs.
+echo Prepared video, split files, encoded files, assembly and output can coexist.
+echo Allow substantially more free space than previous versions. Peak use is not yet measured.
 echo If this is correct press Enter
 echo If not, please close this program and extract the 7z zip file to an appropriate location.
 pause
