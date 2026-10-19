@@ -289,6 +289,8 @@ if %version%==1 (
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_1.78.mkv"
 	if errorlevel 1 goto stage_failed
+	call :validate_assembly "1.78" "docs\temp\BvS_1.78.mkv"
+	if errorlevel 1 goto stage_failed
 
 
 
@@ -536,6 +538,8 @@ if %version%==1 (
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_1.43.mkv"
 	if errorlevel 1 goto stage_failed
+	call :validate_assembly "1.43" "docs\temp\BvS_1.43.mkv"
+	if errorlevel 1 goto stage_failed
 
 
 
@@ -598,7 +602,8 @@ popd
 exit /b 0
 
 :cleanup_incomplete
-echo An output was created; assembly completeness still needs review.
+echo An output was created; independent assembly validation passed.
+echo Full restoration quality still needs review.
 echo Intermediate files and logs remain in "%~dp0docs\temp".
 echo Review or move them before starting another restoration.
 PAUSE
@@ -646,6 +651,19 @@ if exist "docs\temp" (
     endlocal & exit /b 1
 )
 endlocal & exit /b 0
+
+:: Verify decoded frame identity and order before final remux.
+:validate_assembly
+set "stage_name=independent assembly validation: %~1"
+echo Stage: !stage_name!>> "docs\temp\processing.log"
+if not exist "docs\scripts\Validate-Assembly.ps1" (
+ echo Missing assembly validator.>> "docs\temp\processing.log"
+ exit /b 2
+)
+powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "docs\scripts\Validate-Assembly.ps1" -FFmpegPath "docs\programs\ffmpeg\ffmpeg.exe" -AssemblyPath "%~2" -InputListPath "docs\scripts\assembly-inputs-%~1.txt" -WorkDirectory "docs\temp\assembly-validation-%~1" >> "docs\temp\processing.log" 2>&1
+if errorlevel 1 exit /b 2
+if not errorlevel 0 exit /b 2
+exit /b 0
 
 :: Structural output check only; does not qualify media contents.
 :require_stage_output
