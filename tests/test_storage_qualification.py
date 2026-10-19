@@ -17,7 +17,7 @@ BUILDER = importlib.util.module_from_spec(SPEC)
 def variant():
     if not hasattr(BUILDER, 'build'):
         SPEC.loader.exec_module(BUILDER)
-    return BUILDER.build((ROOT/'Batman-v-Superman-IMAX-Restorer.bat').read_bytes()).decode().replace('\r\n','\n')
+    return BUILDER.build((ROOT/'tests/fixtures/storage-qualification-baseline.bat').read_bytes()).decode().replace('\r\n','\n')
 
 
 class StorageSource(unittest.TestCase):
@@ -34,13 +34,13 @@ class StorageSource(unittest.TestCase):
 
     def test_windows_checkout_line_endings_are_equivalent(self):
         variant()
-        source=(ROOT/'Batman-v-Superman-IMAX-Restorer.bat').read_bytes().replace(b'\r\n',b'\n')
+        source=(ROOT/'tests/fixtures/storage-qualification-baseline.bat').read_bytes().replace(b'\r\n',b'\n')
         self.assertEqual(BUILDER.build(source),BUILDER.build(source.replace(b'\n',b'\r\n')))
 
     def test_changed_baseline_is_rejected(self):
         variant()
         with self.assertRaises(ValueError):
-            BUILDER.build((ROOT/'Batman-v-Superman-IMAX-Restorer.bat').read_bytes().replace(b'-b 50800', b'-b 50801'))
+            BUILDER.build((ROOT/'tests/fixtures/storage-qualification-baseline.bat').read_bytes().replace(b'-b 50800', b'-b 50801'))
 
 
 @unittest.skipUnless(os.name == 'nt', 'requires native Windows PowerShell 5.1 and cmd.exe')

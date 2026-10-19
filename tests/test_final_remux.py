@@ -76,7 +76,7 @@ class WindowsRemux(unittest.TestCase):
         cls.build_dir.cleanup()
 
     def run_block(self, root, mode, dialog, dialog2, stub_code=0, missing=False,
-                  empty=False, no_output=False, real_tool=None, source=None, assembled=None):
+                  empty=False, no_output=False, real_tool=None, source=None, assembled=None, existing_output=False):
         temp = root / 'docs' / 'temp'
         tools = root / 'docs' / 'programs' / 'mkvtoolnix'
         temp.mkdir(parents=True)
@@ -92,6 +92,9 @@ class WindowsRemux(unittest.TestCase):
             source_path.write_bytes(b'original synthetic sentinel')
             intermediate.write_bytes(b'assembled synthetic sentinel')
         before = source_path.read_bytes()
+        if existing_output:
+            name = 'Batman v Superman Dawn of Justice Ultimate Edition IMAX ' + ('1.78.mkv' if mode == 1 else '1.43 (unmasked).mkv')
+            (output_dir / name).write_bytes(b'late output sentinel')
         if not missing:
             if real_tool:
                 # Preserve sibling DLL discovery for the real portable tool.
@@ -118,6 +121,15 @@ class WindowsRemux(unittest.TestCase):
                                 env=env, capture_output=True, text=True, timeout=30)
         self.assertEqual(source_path.read_bytes(), before)
         return result, intermediate, root / 'args.txt', output_dir
+
+    def test_late_existing_output_blocks_remux_and_preserves_work(self):
+        for mode in (1, 2):
+            with tempfile.TemporaryDirectory() as directory:
+                result, intermediate, args, output_dir = self.run_block(Path(directory), mode, 'y', 'y', existing_output=True)
+                self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+                self.assertFalse(args.exists())
+                self.assertTrue(intermediate.exists())
+                self.assertEqual(next(output_dir.iterdir()).read_bytes(), b'late output sentinel')
 
     def test_branch_and_exit_status_matrix(self):
         for mode, dialog, dialog2, code in itertools.product((1, 2), ('y', 'n'), ('y', 'n'), (0, 1, 2, 9, -1073741819)):

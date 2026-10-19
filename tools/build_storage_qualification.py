@@ -1,6 +1,6 @@
 """Build a separate, owner-operated BvS 1.78 qualification launcher.
 
-The production launcher is immutable input. No media processing is performed.
+The historical reviewed launcher fixture is immutable input; this reproduces the owner's in-progress qualification kit rather than silently changing that run. No media processing is performed.
 """
 import argparse
 import hashlib
@@ -8,7 +8,7 @@ from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
-BASELINE = ROOT / "Batman-v-Superman-IMAX-Restorer.bat"
+BASELINE = ROOT / "tests/fixtures/storage-qualification-baseline.bat"
 BASELINE_SHA256 = "9a6bf745e16278daa513d35cb2735cc1550a3b2fd6e8cc89dfb65cec513a4727"
 OUTPUT_NAME = "BvS-Storage-Qualification.bat"
 
