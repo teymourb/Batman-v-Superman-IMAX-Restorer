@@ -18,7 +18,17 @@ also checks each fixed load/append input before starting. MKVToolNix warning sta
 1 stops for review; failures return 2. Stage markers and tool diagnostics go to
 processing.log; final-remux diagnostics go to final-remux.log in docs/temp.
 
-These are structural safeguards, not assembly completeness qualification. The
+Structural stage gates are supplemented by independent decoded-frame assembly
+validation before final remux. `docs/scripts/Validate-Assembly.ps1` reads the
+mode-specific ordered manifest, decodes each input and the assembly with the
+bundled FFmpeg, and compares frame hashes in order. Missing validator, signed
+process failures, decode failures and mismatches stop the pipeline and retain
+all work. Its new work directory contains the reports and diagnostics. This
+requires decoding the film twice in total (segments plus assembly) and can be
+slow on 4K HEVC. It adds no processing executable; Windows PowerShell is required.
+
+This does not validate timestamps, HDR metadata, intended cuts/framing or
+synchronization. Cleanup remains disabled until qualification. The
 bundled Avidemux 2.8.1 does not reliably propagate append/save errors to its exit
 status. All intermediates, assembly and logs therefore remain even after a final
 output is created. Completion returns warning 1 and requests manual review. This
@@ -84,7 +94,9 @@ https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/releases/download/v1
 
 ## Next
 
-Independently qualify assembly completeness before restoring automatic deletion.
+Qualify the independent assembly check on actual Windows synthetic media and
+representative real restorations before considering automatic deletion. Current
+branch changes have local static checks only until Windows CI results are recorded.
 Review retained outputs manually when real-film qualification becomes necessary;
 private media needs task-specific consent. Resolve release-package provenance,
 source/license documentation and any asset redistribution questions before
@@ -94,3 +106,10 @@ Then simplify repeated input/remux branches while preserving command baselines.
 Introduce portable planning/profile code when a demonstrated shared need supports
 it. Source-fingerprint qualification remains separate and synthetic-first; the
 reported BvS hash is not an implemented acceptance gate.
+
+## Assembly validation branch
+
+The mode manifests are checked against actual Avidemux load/append argument order.
+Whole-mode synthetic tools isolate validator status handling: a missing validator,
+positive failure and negative failure must prevent final remux and preserve work.
+The original media-command digest remains unchanged. No private media is used.

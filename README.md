@@ -115,10 +115,17 @@ On the 4K Blu-ray disc of BvS, the different types of scenes are encoded as foll
 The proposed 1.0.1 stops preparation, splitting, encoding and assembly when a
 tool reports failure or its expected output is missing or empty. Diagnostics go
 to `docs/temp/processing.log`; final remux diagnostics go to `final-remux.log`.
-These checks do not prove that the assembled film is complete. The bundled
-Avidemux can report success after an append/save failure.
+The bundled Avidemux can report success after an append/save failure. Before
+final remux, an independent check now decodes the assembled video and every
+ordered input with the bundled FFmpeg, comparing decoded frame hashes in order.
+Missing, repeated, reordered or changed decoded frames stop the job. This adds
+a full decode of both the segments and assembly, so it can take substantial time.
+Reports and decode diagnostics remain under `docs/temp/assembly-validation-*`.
+Windows PowerShell runs the included check; no additional processing tool is
+installed. This comparison does not qualify timestamps, HDR metadata, framing,
+source edition, sound synchronization or the correctness of the original cuts.
 
-All intermediates and logs are therefore retained, including after an output is
+All intermediates and logs are still retained, including after an output is
 created. Completion returns warning status 1 and asks you to review the result.
 Keep substantially more free disk space than previous versions: prepared video,
 raw splits, encoded splits, assembly and final output can coexist. There is no

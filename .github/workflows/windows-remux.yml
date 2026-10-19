@@ -1,10 +1,11 @@
-name: Windows final-remux regression
+name: Windows restoration regression
 
 on:
   pull_request:
     paths:
       - 'Batman-v-Superman-IMAX-Restorer.bat'
       - 'tests/**'
+      - 'docs/scripts/**'
       - '.github/workflows/windows-remux.yml'
   workflow_dispatch:
 
@@ -36,6 +37,7 @@ jobs:
           sparse-checkout: |
             /Batman-v-Superman-IMAX-Restorer.bat
             /tests/
+            /docs/scripts/
       - name: Run batch regression matrix with native executable stub
         shell: pwsh
         run: |
@@ -66,7 +68,33 @@ jobs:
           # No processing tools are installed on the developer's Mac or repackaged.
           choco install ffmpeg --version=7.1.1 --yes --no-progress --allow-downgrade
           if ($LASTEXITCODE -ne 0) { throw 'FFmpeg fixture tool installation failed' }
-      - name: Run synthetic packet-preservation test
+      - name: Prepare checksum-verified historical assembly tools
+        shell: pwsh
+        run: |
+          $archive = Join-Path $env:RUNNER_TEMP 'historical-restorer.7z'
+          Invoke-WebRequest 'https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/releases/download/v1.0.0/Batman-v-Superman-IMAX-Restorer_v1.0.0.7z' -OutFile $archive
+          if ((Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant() -ne '7f4701624ae87c21225e339b2caa65085ec7380a446b17bb155d04155ae4829a') {
+            throw 'Historical package checksum mismatch'
+          }
+          $baselineDir = Join-Path $env:RUNNER_TEMP 'historical-assembly-tools'
+          # Extract only tool folders. The film-derived logo is never extracted or used.
+          7z x $archive "-o$baselineDir" 'Batman-v-Superman-IMAX-Restorer_v1.0.0/docs/programs/avidemux/*' 'Batman-v-Superman-IMAX-Restorer_v1.0.0/docs/programs/ffmpeg/*' -y
+          if ($LASTEXITCODE -ne 0) { throw 'Historical tool extraction failed' }
+          $avidemux = Get-ChildItem $baselineDir -Recurse -Filter avidemux_cli.exe | Select-Object -First 1
+          $ffmpeg = Get-ChildItem $baselineDir -Recurse -Filter ffmpeg.exe | Select-Object -First 1
+          if (-not $avidemux -or -not $ffmpeg) { throw 'Historical assembly tools missing' }
+          if ((Get-FileHash $avidemux.FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne '7abf1a406ef27f82c121189939be21a8e15908877b4fb40ed37a0208a74828dd') {
+            throw 'Avidemux differs from audited executable'
+          }
+          if ((Get-FileHash $ffmpeg.FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'd28eec987cf8a2f25f3ce303ff612c35bf7ca541c3a5090de718caf525fb9a62') {
+            throw 'FFmpeg differs from audited executable'
+          }
+          "RESTORER_REAL_AVIDEMUX=$($avidemux.FullName)" >> $env:GITHUB_ENV
+          "RESTORER_BUNDLED_FFMPEG=$($ffmpeg.FullName)" >> $env:GITHUB_ENV
+          "RESTORER_ASSEMBLY_FFMPEG=$($ffmpeg.FullName)" >> $env:GITHUB_ENV
+          & $ffmpeg.FullName -version
+          if ($LASTEXITCODE -ne 0) { throw 'Bundled FFmpeg failed to launch' }
+      - name: Run synthetic media and assembly qualification
         shell: pwsh
         run: |
           & $env:RESTORER_REAL_MKVMERGE --version

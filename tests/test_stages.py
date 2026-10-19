@@ -12,6 +12,14 @@ START = TEXT.index('if %version%==1 (')
 PIPELINE = TEXT[START:]
 
 class StageSource(unittest.TestCase):
+    def test_assembly_manifests_match_actual_append_order(self):
+        for mode in ('1.78','1.43'):
+            command=next(x for x in TEXT.splitlines() if 'avidemux_cli --load' in x and '--save "docs\\temp\\BvS_'+mode+'.mkv"' in x)
+            expected=re.findall(r'--(?:load|append) "([^"]+)"',command)
+            self.assertEqual((ROOT/'docs/scripts'/('assembly-inputs-'+mode+'.txt')).read_text().splitlines(),expected)
+            anchor='call :require_stage_output "docs\\temp\\BvS_'+mode+'.mkv"\n\tif errorlevel 1 goto stage_failed\n\tcall :validate_assembly "'+mode+'"'
+            self.assertIn(anchor,TEXT)
+
     def test_stage_gates_and_retention(self):
         commands = re.findall(r'(?m)^\s*docs\\programs\\[^\n]+processing.log[^\n]*\n([^\n]+)\n([^\n]+)', TEXT)
         self.assertEqual(len(commands), 36)
@@ -34,12 +42,16 @@ class WindowsStages(unittest.TestCase):
     def tearDownClass(cls):
         cls.build.cleanup()
 
-    def run_mode(self, mode, fail=0, code=0, action='normal', omit=None, dialog='y'):
+    def run_mode(self, mode, fail=0, code=0, action='normal', omit=None, dialog='y', validator_code=0, missing_validator=False):
         with tempfile.TemporaryDirectory(prefix='stage with spaces ') as folder:
             root=Path(folder); (root/'docs/temp').mkdir(parents=True)
             for tool in ('mkvtoolnix/mkvmerge', 'ffmpeg/ffmpeg', 'handbrake/HandBrakeCLI', 'avidemux/avidemux_cli'):
                 target=root/'docs/programs'/Path(tool+'.exe');target.parent.mkdir(parents=True,exist_ok=True)
                 if tool != omit: shutil.copyfile(self.stub,target)
+            scripts=root/'docs/scripts';scripts.mkdir()
+            if not missing_validator:
+                # Exercise production invocation/status gate without decoding stub bytes.
+                (scripts/'Validate-Assembly.ps1').write_text('exit '+str(validator_code)+'\n')
             source=root/'synthetic source.mkv';source.write_bytes(b'original sentinel')
             env=os.environ.copy();env.update(version=str(mode),dialog=dialog,dialog2='y',file=str(source) if dialog=='y' else '"'+str(source)+'"',folder=str(root),STAGE_TRACE=str(root/'trace'),STAGE_FAIL_AT=str(fail),STAGE_CODE=str(code),STAGE_ACTION=action)
             harness='@echo off\nsetlocal EnableDelayedExpansion\npushd "%~dp0"\n'+PIPELINE
@@ -91,3 +103,14 @@ class WindowsStages(unittest.TestCase):
         self.assertEqual(result.returncode,1,result.stdout+result.stderr)
         self.assertEqual(len(trace),1)
         self.assertIn('BvS.mkv',files)
+
+    def test_assembly_validator_failure_blocks_remux(self):
+        for mode in (1,2):
+            for code,missing in ((2,False),(-1,False),(0,True)):
+                with self.subTest(mode=mode,code=code,missing=missing):
+                    result,trace,files=self.run_mode(mode,validator_code=code,missing_validator=missing)
+                    self.assertEqual(result.returncode,2,result.stdout+result.stderr)
+                    self.assertEqual(len(trace),17)
+                    self.assertIn('processing.log',files)
+                    self.assertIn('BvS.mkv',files)
+                    self.assertIn('BvS_'+('1.78' if mode==1 else '1.43')+'.mkv',files)
