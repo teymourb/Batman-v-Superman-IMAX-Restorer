@@ -42,7 +42,7 @@ try {
         # Two source-sized working sets, capped encode budget, plus headroom.
         $need = 2L * $source.Length + 14GB + $reserve
         if ((Free-Bytes) -lt $need) { throw 'Insufficient free space for conservative preparation budget.' }
-        $state = @{Source=$source.FullName; Length=$source.Length; Ticks=$source.LastWriteTimeUtc.Ticks; Phase='Preflight'}
+        $state = @{Source=$source.FullName; Length=$source.Length; Ticks=$source.LastWriteTimeUtc.Ticks; Phase='Preflight'; VideoBytes=0}
         $stream = [IO.File]::Open($statePath,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::Read)
         try { $bytes=[Text.Encoding]::UTF8.GetBytes(($state | ConvertTo-Json)); $stream.Write($bytes,0,$bytes.Length) } finally { $stream.Dispose() }
         Record "Preflight source bytes=$($source.Length); free bytes=$(Free-Bytes). No source bytes hashed or modified."
@@ -61,6 +61,7 @@ try {
         $encodedBytes = ($encoded | Measure-Object Length -Sum).Sum
         if ($encodedBytes -gt 14GB) { throw 'Encoded sections exceed planned budget; retain everything for review.' }
         $remove = @(Safe-Path (Join-Path $temp 'BvS.mkv') $true)
+        $state.VideoBytes = $remove[0].Length
         $required = ($inputs | Measure-Object Length -Sum).Sum + $reserve
     } else {
         if ($state.Phase -ne 'BeforeAssembly') { throw 'Unexpected checkpoint order.' }
@@ -69,8 +70,10 @@ try {
         $report = Get-Content -LiteralPath (Join-Path $temp 'assembly-validation-1.78\result.txt') -Raw
         if ($report -notmatch '^PASS: [1-9][0-9]* decoded video frames match ordered inputs\.') { throw 'Independent assembly PASS evidence is missing.' }
         $remove = @(@('BvS_2s.mkv','BvS_4s.mkv','BvS_6s.mkv','BvS_8s.mkv','BvS_10s.mkv') | ForEach-Object { Safe-Path (Join-Path $temp $_) $true })
-        # Source size conservatively covers audio/subtitle/container addition.
-        $required = $assembly.Length + $source.Length + $reserve
+        # Measured video-only copy excludes source audio/subtitles; allow extra mux overhead.
+        if ($state.VideoBytes -le 0) { throw 'Prepared-video size record is missing.' }
+        $otherStreams = [Math]::Max(0L, [long]$source.Length - [long]$state.VideoBytes) + 2GB
+        $required = $assembly.Length + $otherStreams + $reserve
     }
     $reclaimed = ($remove | Measure-Object Length -Sum).Sum
     Record "$Phase free bytes=$(Free-Bytes); removable bytes=$reclaimed; required next-stage budget=$required."
