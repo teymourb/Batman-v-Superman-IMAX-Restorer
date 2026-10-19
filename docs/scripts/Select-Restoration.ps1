@@ -137,7 +137,7 @@ try {
     Write-Host "Mode: $Mode - $modeName"
     Write-Host "Working files: $(Join-Path $root 'docs\temp')"
     $sourceBytes = (Get-Item -LiteralPath $Source).Length
-    Write-Host ('Source size: {0:N2} GiB ({1} bytes); metadata only.' -f ($sourceBytes / 1GB), $sourceBytes)
+    Write-Host ('Source size: {0:N2} GiB ({1} bytes).' -f ($sourceBytes / 1GB), $sourceBytes)
     Show-AvailableSpace 'working drive' $root
     Show-AvailableSpace 'destination drive' $Destination
     if ([string]::Equals([IO.Path]::GetPathRoot($root), [IO.Path]::GetPathRoot($Destination), [StringComparison]::OrdinalIgnoreCase)) {
