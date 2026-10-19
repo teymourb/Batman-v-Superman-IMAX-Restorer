@@ -58,7 +58,9 @@ function Write-FrameHashes([string]$Source, [string]$Stem) {
         $started = $true
         $copy = $process.StandardError.BaseStream.CopyToAsync($log)
         $process.WaitForExit()
-        $copy.GetAwaiter().GetResult()
+        # PowerShell 5.1 reflects the concrete Task<VoidTaskResult>; suppress
+        # its internal completion value so this function returns ONLY a path.
+        $null = $copy.GetAwaiter().GetResult()
         if ($process.ExitCode -ne 0) { throw "Decode failed for $Source; see $logPath" }
     } finally {
         try {
@@ -88,7 +90,8 @@ function Write-FrameHashes([string]$Source, [string]$Stem) {
     return Require-File $hashPath
 }
 
-function Open-Hashes([string]$Path) {
+function Open-Hashes($Path) {
+    if ($Path -isnot [string]) { throw 'Hash generator returned unexpected pipeline values' }
     return @{ Reader = [IO.File]::OpenText($Path); Formats = [IO.File]::OpenText($Path + '.formats'); Headers = @{}; Frames = [long]0; Ready = $false }
 }
 function Next-Frame($State) {

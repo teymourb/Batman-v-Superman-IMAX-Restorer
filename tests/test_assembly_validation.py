@@ -21,6 +21,7 @@ class ValidatorSourceTests(unittest.TestCase):
         self.assertNotIn('Remove-Item', text)
         self.assertIn('ReadLine()', text)
         self.assertIn('CopyToAsync', text)
+        self.assertIn('$null = $copy.GetAwaiter().GetResult()', text)
 
 
 @unittest.skipUnless(os.name == 'nt' and FFMPEG, 'Requires Windows PowerShell and synthetic FFmpeg tool')
