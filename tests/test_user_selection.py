@@ -59,7 +59,13 @@ class SelectionWindows(unittest.TestCase):
         trace=self.root/'trace.txt'; env=os.environ.copy(); env['SELECTION_TRACE']=str(trace)
         result=subprocess.run(['powershell.exe','-NoProfile','-STA','-ExecutionPolicy','Bypass','-File',str(HELPER),'-Film','BvS','-Manual','-Launcher',str(child)],input=f'{self.source}\n{self.dest}\n1\nwrong-answer\ny\n',capture_output=True,text=True,encoding='utf-8',timeout=30,env=env)
         self.assertEqual(result.returncode,7,result.stdout+result.stderr)
-        self.assertEqual(trace.read_text(encoding='utf-8').splitlines(),[str(self.source),str(self.dest),'1','y'])
+        recorded = trace.read_text(encoding='utf-8').splitlines()
+        # PowerShell's GetFullPath may expand the runner's 8.3 TEMP directory.
+        self.assertTrue(Path(recorded[0]).samefile(self.source))
+        self.assertTrue(Path(recorded[1]).samefile(self.dest))
+        self.assertEqual(Path(recorded[0]).name, self.source.name)
+        self.assertEqual(Path(recorded[1]).name, self.dest.name)
+        self.assertEqual(recorded[2:], ['1', 'y'])
         self.assertIn('A file path is not a confirmation',result.stdout)
     def test_selected_entry_without_valid_settings_stops(self):
         env=os.environ.copy()
