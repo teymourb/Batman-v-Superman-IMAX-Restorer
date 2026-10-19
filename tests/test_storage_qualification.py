@@ -70,7 +70,7 @@ class StorageWindows(unittest.TestCase):
             helper=helper.replace("function Read-Host { param($Prompt) 'SECOND_NO' }", "function Read-Host { param($Prompt) if ($Phase -eq 'BeforeRemux') { 'NO' } else { 'REMOVE' } }")
         if not missing_helper:
             (scripts/'Storage-Qualification-Checkpoint.ps1').write_text(helper)
-        (scripts/'Validate-Assembly.ps1').write_text("New-Item -ItemType Directory -Path 'docs/temp/assembly-validation-1.78' | Out-Null\nSet-Content 'docs/temp/assembly-validation-1.78/result.txt' '"+('PASS: 1 decoded video frames match ordered inputs.' if validator==0 else 'FAIL: synthetic validator')+"'\nexit "+str(validator))
+        (scripts/'Validate-Assembly.ps1').write_text("$work = Join-Path (Get-Location).Path 'docs/temp/assembly-validation-1.78'\n[IO.Directory]::CreateDirectory($work) | Out-Null\n[IO.File]::WriteAllText((Join-Path $work 'result.txt'), '"+('PASS: 1 decoded video frames match ordered inputs.' if validator==0 else 'FAIL: synthetic validator')+"')\nexit "+str(validator))
         source=root/'source.mkv'; source.write_bytes(b'original source sentinel')
         env=os.environ.copy(); env.update(version=str(mode),dialog='y',dialog2='y',file=str(source),folder=str(root),STAGE_TRACE=str(root/'trace'),STAGE_FAIL_AT=str(fail),STAGE_CODE='2',STAGE_ACTION='normal')
         start = 'if not exist \"docs\\scripts\\Storage-Qualification-Checkpoint.ps1\" (' if missing_helper else 'if not \"%version%\"==\"1\" ('
