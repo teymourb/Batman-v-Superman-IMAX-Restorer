@@ -32,7 +32,7 @@ Choose between 2 **constant-width** IMAX Restorations:
 - Launch *Batman-v-Superman-IMAX-Restorer.bat* and disregard the unknow publisher prompt  
 - Select your source rip .mkv file when prompted  
 - Select your destination folder for the output file  
-- If prompted to accept or decline a command towards the end of the encoding, enter y for yes
+- If Avidemux asks a codec-compatibility question, read it and choose deliberately. Continuing does not establish that the join is compatible.
 - In the 1.0.1 maintenance candidate, a new run preserves any existing `docs/temp` folder and stops. Move that folder somewhere safe before starting a new restoration. Published 1.0.0 still uses automatic startup cleanup: recover temporary work before restarting that version.
 
 <br>
@@ -121,7 +121,7 @@ handling and evidence; it does not fix legacy codec/join compatibility.
 Run the BAT and select source, existing output folder, restoration mode and an
 explicit check level before confirming:
 
-- **Routine:** tool exit statuses and required nonempty outputs are checked.
+- **Basic (routine):** tool exit statuses and required nonempty outputs are checked.
   The decoded-frame assembly comparison is **NOT RUN**. This cannot establish
   pristine joins, complete picture identity, timestamps, HDR or synchronization.
 - **Exhaustive:** additionally decode the assembly and ordered sections and
@@ -133,8 +133,8 @@ explicit check level before confirming:
 FFmpeg does not accept accidental keyboard commands during splitting. Avidemux
 runs visibly in the console so its codec-compatibility questions can be answered
 explicitly. A warning remains unresolved even if you choose to continue. Full
-Avidemux diagnostics appear in the console; processing.log records its stage and
-status, not a complete assembly transcript. Other processing diagnostics and
+Avidemux diagnostics appear in the console; processing.log records its stage
+marker, not a complete assembly transcript. Other processing diagnostics and
 validation reports remain in docs/temp; final mux logs are in final-remux.log.
 
 Tool failures or missing/empty outputs stop the job. The bundled Avidemux may
