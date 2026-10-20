@@ -1,3 +1,9 @@
+## Dialog readiness — unreleased
+
+Pause for Enter before opening each file/folder dialog, so the preceding
+instructions remain readable. Q quits before a dialog opens. Manual path entry,
+source verification and restoration behavior are unchanged.
+
 ## Console presentation — unreleased
 
 Group setup and results with ASCII headings and spacing. Wrap long displayed

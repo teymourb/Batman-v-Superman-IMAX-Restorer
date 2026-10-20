@@ -93,8 +93,18 @@ function Check-Selection {
     $workspace = Join-Path $root 'docs\temp'
     if (Test-Path -LiteralPath $workspace) { throw "Existing work found at $workspace. Preserve it and review the logs before moving it aside. Nothing was deleted." }
 }
+function Wait-ForDialog([bool]$IsSource) {
+    $prompt = if ($IsSource) { 'Press Enter to open the file-selection window, or Q to quit' } else { 'Press Enter to open the output-folder window, or Q to quit' }
+    while ($true) {
+        $answer = Read-Host $prompt
+        if ($answer -and $answer.Trim() -eq 'q') { throw [OperationCanceledException]::new('Cancelled. No processing started.') }
+        if ([string]::IsNullOrWhiteSpace($answer)) { return }
+        Write-Host 'Press Enter when you are ready, or enter Q to quit.'
+    }
+}
 function Select-Path([bool]$IsSource) {
     if (-not $Manual) {
+        Wait-ForDialog $IsSource
         $dialog = $null
         try {
             Add-Type -AssemblyName System.Windows.Forms
@@ -144,7 +154,7 @@ try {
         Write-Host ''
         Show-Wrapped 'Your original MKV is not modified. The restoration is saved as a separate file.'
         Write-Host ''
-        Show-Wrapped 'No processing has started. At a text prompt, enter q or leave it blank to quit.'
+        Show-Wrapped 'No processing has started. Enter Q to quit during setup.'
         Show-Heading 'Step 1 of 3 - Source MKV'
         Show-Wrapped 'Select your source MKV in the file dialog.'
         while ($true) {

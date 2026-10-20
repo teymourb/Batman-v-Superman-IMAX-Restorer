@@ -1,3 +1,12 @@
+# Dialog readiness — 2026-10-20
+
+Each native file/folder dialog waits for Enter after printing its instructions.
+Q cancels before opening it. This includes re-opening a dialog after an invalid
+selection. The pause is outside the dialog-error fallback catch, so cancellation
+cannot be mistaken for an unavailable dialog. Manual mode and validation-only
+entry points do not add pauses. Focused Windows readiness tests cover Enter, Q
+and invalid-answer retry without opening GUI windows in CI.
+
 # Console presentation and local packaging — 2026-10-20
 
 The owner-approved ASCII layout groups setup, choices, paths, storage and results.
