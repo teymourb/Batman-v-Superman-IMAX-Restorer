@@ -1,7 +1,7 @@
 # Source-video fingerprint gate — implementation record, 2026-10-20
 
-This runtime gate is being implemented and must pass reviewed synthetic Windows
-checks before candidate qualification. No agent inspected a private film. The
+This runtime gate is implemented. Reviewed synthetic Windows checks in PR #14
+are required before candidate qualification. No agent inspected a private film. The
 reference values below come from owner-operated Windows commands/screenshots.
 
 ## Version 1 recipes and acceptance values

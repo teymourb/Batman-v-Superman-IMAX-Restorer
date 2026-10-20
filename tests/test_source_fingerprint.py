@@ -85,6 +85,9 @@ class FingerprintWindows(unittest.TestCase):
                                  '-WorkDirectory', str(work)], capture_output=True, text=True, timeout=60)
         if before is not None:
             self.assertEqual(source.read_bytes(), before, 'source was modified')
+        record = json.loads((work / 'source-fingerprint.json').read_text(encoding='utf-8'))
+        self.assertEqual(record['status'] == 'MATCH', result.returncode == 0, record)
+        self.assertFalse(list(work.glob('source-check-*/extracted-video.bin')), 'owned scratch extraction leaked')
         return result, work
 
     def test_avc_exact_match_and_changed_picture_rejected(self):
