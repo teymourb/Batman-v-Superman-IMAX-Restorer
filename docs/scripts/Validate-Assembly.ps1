@@ -5,7 +5,9 @@ param(
     [Parameter(Mandatory=$true)][string]$FFmpegPath,
     [Parameter(Mandatory=$true)][string]$AssemblyPath,
     [Parameter(Mandatory=$true)][string]$InputListPath,
-    [Parameter(Mandatory=$true)][string]$WorkDirectory
+    [Parameter(Mandatory=$true)][string]$WorkDirectory,
+    # A file may be created by an external caller to request controlled cancellation.
+    [string]$CancellationFile
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -34,6 +36,18 @@ function Quote-Argument([string]$Value) {
     return $quoted + ('\' * (2 * $slashes)) + '"'
 }
 
+function Test-Cancellation {
+    $cancel = $CancellationFile -and [IO.File]::Exists($CancellationFile)
+    if (-not [Console]::IsInputRedirected) {
+        try {
+            while ([Console]::KeyAvailable) {
+                if ([Console]::ReadKey($true).Key -eq [ConsoleKey]::Q) { $cancel = $true }
+            }
+        } catch [InvalidOperationException] { }
+    }
+    if ($cancel) { throw 'CANCELLED by request; no validation pass. All evidence is retained.' }
+}
+
 function Write-FrameHashes([string]$Source, [string]$Stem) {
     $hashPath = Join-Path $script:work ($Stem + '.framehash')
     $logPath = Join-Path $script:work ($Stem + '.stderr.log')
@@ -57,6 +71,16 @@ function Write-FrameHashes([string]$Source, [string]$Stem) {
         if (-not $process.Start()) { throw 'FFmpeg did not start' }
         $started = $true
         $copy = $process.StandardError.BaseStream.CopyToAsync($log)
+        $elapsed = [Diagnostics.Stopwatch]::StartNew()
+        $nextMessage = 10
+        Write-Host "Decoding $Stem for frame comparison. Press Q to cancel; detailed log: $logPath"
+        while (-not $process.WaitForExit(250)) {
+            if ($elapsed.Elapsed.TotalSeconds -ge $nextMessage) {
+                Write-Host ("Validation still running: {0}; elapsed {1} seconds. No encoding." -f $Stem, [int]$elapsed.Elapsed.TotalSeconds)
+                $nextMessage += 10
+            }
+            Test-Cancellation
+        }
         $process.WaitForExit()
         # PowerShell 5.1 reflects the concrete Task<VoidTaskResult>; suppress
         # its internal completion value so this function returns ONLY a path.
@@ -78,6 +102,7 @@ function Write-FrameHashes([string]$Source, [string]$Stem) {
     $count = [long]0
     try {
         while ($null -ne ($line = $logReader.ReadLine())) {
+            if (($count % 1000) -eq 0) { Test-Cancellation }
             if ($line -match '\[(error|fatal|panic)\]') { throw "Decoder error: see $logPath" }
             if ($line -match '\[Parsed_showinfo_\d+ @[^]]+\].*\bn:\s*(\d+)\s+pts:.*\bfmt:([A-Za-z0-9_]+).*?\bs:(\d+x\d+)') {
                 if ([long]$Matches[1] -ne $count) { throw 'Unexpected decoded frame sequence' }
@@ -96,6 +121,7 @@ function Open-Hashes($Path) {
 }
 function Next-Frame($State) {
     while ($null -ne ($line = $State.Reader.ReadLine())) {
+        if (($State.Frames % 1000) -eq 0) { Test-Cancellation }
         if ($line.StartsWith('#')) {
             if ($State.Ready) { throw 'Unexpected header within frame records' }
             if ($line -match '^#(version|hash|media_type 0|codec_id 0|dimensions 0):\s*(.+)$') {

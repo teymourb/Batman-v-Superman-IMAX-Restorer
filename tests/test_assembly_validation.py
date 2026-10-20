@@ -4,6 +4,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import tempfile
+import time
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -129,6 +130,7 @@ class Decoder {
     static int Main(string[] args) {
         string mode = Environment.GetEnvironmentVariable("ASSEMBLY_DECODER_FAULT");
         string output = args[args.Length - 1];
+        if (mode == "slow") { File.WriteAllText(output + ".pid", System.Diagnostics.Process.GetCurrentProcess().Id.ToString()); System.Threading.Thread.Sleep(60000); }
         string text = "#version: 2\n#hash: SHA256\n#media_type 0: video\n#codec_id 0: rawvideo\n#dimensions 0: 64x48\n0, 0, 0, 1, 4608, " + new string('a', 64) + "\n";
         if (mode == "missing") return 0;
         if (mode == "directory") { Directory.CreateDirectory(output); return 0; }
@@ -152,6 +154,42 @@ class Decoder {
     @classmethod
     def tearDownClass(cls):
         cls.build.cleanup()
+
+    def test_controlled_cancellation_stops_own_decoder_and_retains_evidence(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            segment = root / 'segment.mkv'
+            segment.write_bytes(b'preserved synthetic input')
+            listing = root / 'inputs.txt'
+            listing.write_text(str(segment) + '\n', encoding='utf-8')
+            cancel = root / 'cancel.request'
+            env = os.environ.copy()
+            env['ASSEMBLY_DECODER_FAULT'] = 'slow'
+            process = subprocess.Popen(['powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass',
+                '-File', str(VALIDATOR), '-FFmpegPath', str(self.stub), '-AssemblyPath', str(segment),
+                '-InputListPath', str(listing), '-WorkDirectory', str(root / 'evidence'),
+                '-CancellationFile', str(cancel)], stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=env)
+            pidfile = root / 'evidence/assembled.framehash.pid'
+            try:
+                deadline = time.monotonic() + 20
+                while not pidfile.exists() and time.monotonic() < deadline:
+                    time.sleep(0.1)
+                self.assertTrue(pidfile.exists(), 'Decoder did not start')
+                decoder_pid = int(pidfile.read_text())
+                cancel.touch()
+                stdout, stderr = process.communicate(timeout=15)
+                self.assertEqual(process.returncode, 2, stdout + stderr)
+                self.assertIn('CANCELLED', (root / 'evidence/result.txt').read_text())
+                alive = subprocess.run(['powershell.exe', '-NoProfile', '-Command',
+                    f'if (Get-Process -Id {decoder_pid} -ErrorAction SilentlyContinue) {{ exit 1 }}'],
+                    capture_output=True, timeout=15)
+                self.assertEqual(alive.returncode, 0)
+                self.assertEqual(segment.read_bytes(), b'preserved synthetic input')
+            finally:
+                if process.poll() is None:
+                    cancel.touch()
+                    process.communicate(timeout=15)
 
     def test_decoder_errors_and_unparseable_hashes_fail_closed(self):
         for mode in ['missing', 'directory', 'empty', 'headeronly', 'malformed',

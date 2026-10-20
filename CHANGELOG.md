@@ -2,9 +2,13 @@
 
 ## Unreleased — proposed 1.0.1
 
-- Independently compare the assembled decoded video against every ordered input
-  before final remux; retain per-file hashes and decode diagnostics. A failed or
-  unavailable validator stops processing. This adds full-video decoding time.
+- Require an explicit Basic/Exhaustive check choice before processing. Basic
+  retains tool/input/output guards and records decoded comparison NOT RUN.
+  Exhaustive compares ordered decoded frames and can take many hours; failed,
+  cancelled or unavailable validation stops processing without a PASS.
+- Disable accidental FFmpeg keyboard input and show Avidemux questions and
+  diagnostics directly in the console. Do not automatically accept warnings.
+  Exhaustive comparison shows elapsed progress and supports Q cancellation.
 - Stop failed preparation/splitting/encoding/assembly immediately, record stage
   diagnostics and reject missing/empty expected outputs before dependent work.
 - Catch negative native-process crash statuses as well as positive failures.

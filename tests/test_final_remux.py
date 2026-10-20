@@ -31,13 +31,15 @@ def media_commands(text):
         if line.startswith('docs\\programs\\'):
             line = line.split(' > "docs\\temp\\final-remux.log"', 1)[0]
             line = line.split(' >> "docs\\temp\\processing.log"', 1)[0]
+            if line.startswith('docs\\programs\\ffmpeg\\ffmpeg '):
+                line = line.replace(' -nostdin', '')
             commands.append(line)
     return '\n'.join(commands).encode()
 
 
 class SourceRegression(unittest.TestCase):
     def test_processing_commands_preserved(self):
-        # v1.0.0 command baseline; only diagnostic redirection may change.
+        # Historical transformation baseline; diagnostic redirection and -nostdin do not transform media.
         self.assertEqual(hashlib.sha256(media_commands(TEXT)).hexdigest(),
                          'e408b65705da5723e44aec4a428f539fa908a061ffbeddf1c6af09ff7310e9d8')
 
@@ -104,6 +106,7 @@ class WindowsRemux(unittest.TestCase):
             else:
                 shutil.copyfile(self.stub, tools / 'mkvmerge.exe')
         env = os.environ.copy()
+        env['RESTORER_VALIDATION_MODE'] = 'exhaustive'
         env.update(dialog=dialog, dialog2=dialog2,
                    file=str(source_path) if dialog == 'y' else '"' + str(source_path) + '"',
                    folder=str(output_dir) + ('\\' if dialog2 == 'n' else ''),

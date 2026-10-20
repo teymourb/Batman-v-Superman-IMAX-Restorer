@@ -23,7 +23,8 @@ checks each fixed load/append input before starting. MKVToolNix warning status 1
 stops for review; failures return 2. Stage markers and tool diagnostics go to
 processing.log; final-remux diagnostics go to final-remux.log in docs/temp.
 
-Before final remux, `docs/scripts/Validate-Assembly.ps1` reads the mode-specific
+When exhaustive checking is selected, before final remux
+`docs/scripts/Validate-Assembly.ps1` reads the mode-specific
 ordered manifest and uses the bundled FFmpeg to compare decoded frame hashes
 of the segments, in order, against the assembly. Missing validator/tool, process
 failures, decoder errors, malformed reports and mismatches stop processing and
@@ -196,3 +197,32 @@ source identity, codec joins, timestamps, HDR, synchronization or playback. The
 new file is labelled UNQUALIFIED and must not be presented as a release-qualified
 restoration. A start-only result without completed-result.txt means interrupted
 packaging. This operation is not a general resume feature or normal user workflow.
+
+## Maintenance RC interaction and validation policy (2026-10-20)
+
+Setup now requires an explicit choice between basic checks and exhaustive decoded
+frame comparison. Basic retains process-status, expected-output and input checks;
+it does not establish assembly frame identity, codec compatibility, timestamps,
+HDR, audio synchronization or playback. Its assembly-check.txt explicitly says
+NOT RUN. Exhaustive records RUNNING, then PASS only after validator exit 0; a
+failure or controlled cancellation records NOT PASSED and stops final remux.
+Neither mode enables automatic cleanup. Both retain all intermediates and logs.
+
+All production FFmpeg split invocations add only -nostdin, disabling accidental
+keyboard commands. Cut positions, frame counts, stream-copy flags, HandBrake
+settings, Avidemux load/append order and tool versions remain unchanged.
+Avidemux runs attached to the console so codec questions and answers are visible.
+No warning is automatically accepted. Its detailed stdout/stderr now appear only
+in that console, not processing.log; the log retains the assembly stage marker
+and subsequent validation status. Declining a question does not guarantee the
+historical tool reports failure; basic checks cannot qualify a partial assembly.
+
+Exhaustive validation prints the active file and ten-second elapsed heartbeats.
+Press Q to cancel its decoding, parsing or comparison; it stops processing,
+terminates only its own decoder child if active and preserves evidence. The
+optional CancellationFile parameter requests the same cancellation for automation
+and tests; it cannot bypass validation or establish a pass. Ctrl+C and forced
+host termination cannot guarantee a completed status record; never infer PASS
+from a RUNNING record. Actual interactive Windows keyboard behavior still needs
+bounded desktop qualification; native cancellation-file tests cover the shared
+stop/child-cleanup path using synthetic data.

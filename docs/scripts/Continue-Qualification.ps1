@@ -114,7 +114,7 @@ try {
         while (-not $process.WaitForExit(10000)) {
             Write-Host ('Packaging still running; elapsed {0:N0} seconds. No encoding.' -f $watch.Elapsed.TotalSeconds)
         }
-        $stdout.GetAwaiter().GetResult(); $stderr.GetAwaiter().GetResult()
+        $null = $stdout.GetAwaiter().GetResult(); $null = $stderr.GetAwaiter().GetResult()
         $status = $process.ExitCode
     } finally {
         # Only the process started above is owned by this helper. Do not terminate unrelated tasks.

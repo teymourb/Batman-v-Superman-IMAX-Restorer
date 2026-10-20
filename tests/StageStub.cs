@@ -6,6 +6,12 @@ class StageStub {
         string trace = Environment.GetEnvironmentVariable("STAGE_TRACE");
         int index = File.Exists(trace) ? File.ReadAllLines(trace).Length + 1 : 1;
         File.AppendAllText(trace, String.Join("|", args) + Environment.NewLine);
+        if (Array.IndexOf(args, "--save") >= 0 && Environment.GetEnvironmentVariable("STAGE_QUESTION") == "yes") {
+            Console.Error.WriteLine("SYNTHETIC CODEC QUESTION: continue? y/n");
+            string answer = Console.ReadLine();
+            Console.WriteLine("SYNTHETIC ANSWER: " + answer);
+            if (answer != "y") return 2;
+        }
         string output = null;
         for (int i = 0; i < args.Length - 1; i++)
             if (args[i] == "-o" || args[i] == "--save") output = args[i + 1];

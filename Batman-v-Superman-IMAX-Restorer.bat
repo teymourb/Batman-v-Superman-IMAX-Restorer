@@ -55,7 +55,7 @@ if %version%==1 (
 	set "stage_name=ffmpeg: BvS_2s.mkv"
 	echo [%TIME%] Copying a video section without encoding...
 	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 00:05:09.142 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 85890 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_2s.mkv" >> "docs\temp\processing.log" 2>&1
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 00:05:09.142 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 85890 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_2s.mkv" >> "docs\temp\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_2s.mkv"
@@ -65,7 +65,7 @@ if %version%==1 (
 	set "stage_name=ffmpeg: BvS_4s.mkv"
 	echo [%TIME%] Copying a video section without encoding...
 	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 01:09:18.715 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 77191 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_4s.mkv" >> "docs\temp\processing.log" 2>&1
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 01:09:18.715 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 77191 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_4s.mkv" >> "docs\temp\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_4s.mkv"
@@ -75,7 +75,7 @@ if %version%==1 (
 	set "stage_name=ffmpeg: BvS_6s.mkv"
 	echo [%TIME%] Copying a video section without encoding...
 	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:10:22.606 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 44494 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_6s.mkv" >> "docs\temp\processing.log" 2>&1
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:10:22.606 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 44494 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_6s.mkv" >> "docs\temp\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_6s.mkv"
@@ -85,7 +85,7 @@ if %version%==1 (
 	set "stage_name=ffmpeg: BvS_8s.mkv"
 	echo [%TIME%] Copying a video section without encoding...
 	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:50:35.850 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 4163 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_8s.mkv" >> "docs\temp\processing.log" 2>&1
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:50:35.850 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 4163 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_8s.mkv" >> "docs\temp\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_8s.mkv"
@@ -95,7 +95,7 @@ if %version%==1 (
 	set "stage_name=ffmpeg: BvS_10s.mkv"
 	echo [%TIME%] Copying a video section without encoding...
 	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:54:43.862 -noaccurate_seek -i "docs\temp\BvS.mkv" -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_10s.mkv" >> "docs\temp\processing.log" 2>&1
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:54:43.862 -noaccurate_seek -i "docs\temp\BvS.mkv" -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_10s.mkv" >> "docs\temp\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_10s.mkv"
@@ -108,7 +108,7 @@ if %version%==1 (
 	set "stage_name=ffmpeg: BvS_1i.mkv"
 	echo [%TIME%] Copying a video section without encoding...
 	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -threads 0 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 7388 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_1i.mkv" >> "docs\temp\processing.log" 2>&1
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 7388 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_1i.mkv" >> "docs\temp\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_1i.mkv"
@@ -129,7 +129,7 @@ if %version%==1 (
 	set "stage_name=ffmpeg: BvS_3i.mkv"
 	echo [%TIME%] Copying a video section without encoding...
 	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 01:04:51.470 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 6427 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_3i.mkv" >> "docs\temp\processing.log" 2>&1
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 01:04:51.470 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 6427 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_3i.mkv" >> "docs\temp\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_3i.mkv"
@@ -150,7 +150,7 @@ if %version%==1 (
 	set "stage_name=ffmpeg: BvS_5i.mkv"
 	echo [%TIME%] Copying a video section without encoding...
 	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:02:58.190 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 10633 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_5i.mkv" >> "docs\temp\processing.log" 2>&1
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:02:58.190 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 10633 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_5i.mkv" >> "docs\temp\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_5i.mkv"
@@ -171,7 +171,7 @@ if %version%==1 (
 	set "stage_name=ffmpeg: BvS_7i.mkv"
 	echo [%TIME%] Copying a video section without encoding...
 	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:41:18.377 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 13366 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_7i.mkv" >> "docs\temp\processing.log" 2>&1
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:41:18.377 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 13366 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_7i.mkv" >> "docs\temp\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_7i.mkv"
@@ -192,7 +192,7 @@ if %version%==1 (
 	set "stage_name=ffmpeg: BvS_9i.mkv"
 	echo [%TIME%] Copying a video section without encoding...
 	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:53:29.482 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 1804 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -map_metadata -1 -y "docs\temp\BvS_9i.mkv" >> "docs\temp\processing.log" 2>&1
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:53:29.482 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 1804 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -map_metadata -1 -y "docs\temp\BvS_9i.mkv" >> "docs\temp\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_9i.mkv"
@@ -238,8 +238,11 @@ if %version%==1 (
 	call :require_stage_output "docs\temp\BvS_10s.mkv"
 	if errorlevel 1 goto stage_failed
 	echo [%TIME%] Joining the processed sections...
+	echo Assembly diagnostics and any questions appear in this window, not processing.log.
+	echo Answer only an explicit assembly question: y continues despite its warning; n declines.
+	echo Continuing does not establish codec compatibility or seamless joins.
 	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\avidemux\avidemux_cli --load "docs\temp\BvS_1i_Cropped.mkv" --append "docs\temp\BvS_2s.mkv" --append "docs\temp\BvS_3i_Cropped.mkv" --append "docs\temp\BvS_4s.mkv" --append "docs\temp\BvS_5i_Cropped.mkv" --append "docs\temp\BvS_6s.mkv" --append "docs\temp\BvS_7i_Cropped.mkv" --append "docs\temp\BvS_8s.mkv" --append "docs\temp\BvS_9i_Cropped.mkv" --append "docs\temp\BvS_10s.mkv" --video-codec copy --audio-codec copy --output-format mkv --save "docs\temp\BvS_1.78.mkv" >> "docs\temp\processing.log" 2>&1
+	docs\programs\avidemux\avidemux_cli --load "docs\temp\BvS_1i_Cropped.mkv" --append "docs\temp\BvS_2s.mkv" --append "docs\temp\BvS_3i_Cropped.mkv" --append "docs\temp\BvS_4s.mkv" --append "docs\temp\BvS_5i_Cropped.mkv" --append "docs\temp\BvS_6s.mkv" --append "docs\temp\BvS_7i_Cropped.mkv" --append "docs\temp\BvS_8s.mkv" --append "docs\temp\BvS_9i_Cropped.mkv" --append "docs\temp\BvS_10s.mkv" --video-codec copy --audio-codec copy --output-format mkv --save "docs\temp\BvS_1.78.mkv"
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_1.78.mkv"
@@ -323,7 +326,7 @@ if %version%==1 (
 	set "stage_name=ffmpeg: BvS_1i.mkv"
 	echo [%TIME%] Copying a video section without encoding...
 	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -threads 0 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 7388 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_1i.mkv" >> "docs\temp\processing.log" 2>&1
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 7388 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_1i.mkv" >> "docs\temp\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_1i.mkv"
@@ -333,7 +336,7 @@ if %version%==1 (
 	set "stage_name=ffmpeg: BvS_3i.mkv"
 	echo [%TIME%] Copying a video section without encoding...
 	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 01:04:51.470 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 6427 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_3i.mkv" >> "docs\temp\processing.log" 2>&1
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 01:04:51.470 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 6427 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_3i.mkv" >> "docs\temp\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_3i.mkv"
@@ -343,7 +346,7 @@ if %version%==1 (
 	set "stage_name=ffmpeg: BvS_5i.mkv"
 	echo [%TIME%] Copying a video section without encoding...
 	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:02:58.190 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 10633 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_5i.mkv" >> "docs\temp\processing.log" 2>&1
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:02:58.190 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 10633 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_5i.mkv" >> "docs\temp\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_5i.mkv"
@@ -353,7 +356,7 @@ if %version%==1 (
 	set "stage_name=ffmpeg: BvS_7i.mkv"
 	echo [%TIME%] Copying a video section without encoding...
 	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:41:18.377 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 13366 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_7i.mkv" >> "docs\temp\processing.log" 2>&1
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:41:18.377 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 13366 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_7i.mkv" >> "docs\temp\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_7i.mkv"
@@ -363,7 +366,7 @@ if %version%==1 (
 	set "stage_name=ffmpeg: BvS_9i.mkv"
 	echo [%TIME%] Copying a video section without encoding...
 	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:53:29.482 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 1804 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_9i.mkv" >> "docs\temp\processing.log" 2>&1
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:53:29.482 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 1804 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_9i.mkv" >> "docs\temp\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_9i.mkv"
@@ -376,7 +379,7 @@ if %version%==1 (
 	set "stage_name=ffmpeg: BvS_2s.mkv"
 	echo [%TIME%] Copying a video section without encoding...
 	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 00:05:09.142 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 85890 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_2s.mkv" >> "docs\temp\processing.log" 2>&1
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 00:05:09.142 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 85890 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_2s.mkv" >> "docs\temp\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_2s.mkv"
@@ -397,7 +400,7 @@ if %version%==1 (
 	set "stage_name=ffmpeg: BvS_4s.mkv"
 	echo [%TIME%] Copying a video section without encoding...
 	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 01:09:18.715 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 77191 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_4s.mkv" >> "docs\temp\processing.log" 2>&1
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 01:09:18.715 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 77191 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_4s.mkv" >> "docs\temp\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_4s.mkv"
@@ -418,7 +421,7 @@ if %version%==1 (
 	set "stage_name=ffmpeg: BvS_6s.mkv"
 	echo [%TIME%] Copying a video section without encoding...
 	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:10:22.606 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 44494 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_6s.mkv" >> "docs\temp\processing.log" 2>&1
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:10:22.606 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 44494 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_6s.mkv" >> "docs\temp\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_6s.mkv"
@@ -439,7 +442,7 @@ if %version%==1 (
 	set "stage_name=ffmpeg: BvS_8s.mkv"
 	echo [%TIME%] Copying a video section without encoding...
 	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:50:35.850 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 4163 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_8s.mkv" >> "docs\temp\processing.log" 2>&1
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:50:35.850 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 4163 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_8s.mkv" >> "docs\temp\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_8s.mkv"
@@ -460,7 +463,7 @@ if %version%==1 (
 	set "stage_name=ffmpeg: BvS_10s.mkv"
 	echo [%TIME%] Copying a video section without encoding...
 	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -threads 0 -ss 02:54:43.862 -noaccurate_seek -i "docs\temp\BvS.mkv" -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_10s.mkv" >> "docs\temp\processing.log" 2>&1
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:54:43.862 -noaccurate_seek -i "docs\temp\BvS.mkv" -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_10s.mkv" >> "docs\temp\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_10s.mkv"
@@ -503,7 +506,10 @@ if %version%==1 (
 	if errorlevel 1 goto stage_failed
 	echo [%TIME%] Joining the processed sections...
 	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\avidemux\avidemux_cli --load "docs\temp\BvS_1i.mkv" --append "docs\temp\BvS_2s_Windowboxed.mkv" --append "docs\temp\BvS_3i.mkv" --append "docs\temp\BvS_4s_Windowboxed.mkv" --append "docs\temp\BvS_5i.mkv" --append "docs\temp\BvS_6s_Windowboxed.mkv" --append "docs\temp\BvS_7i.mkv" --append "docs\temp\BvS_8s_Windowboxed.mkv" --append "docs\temp\BvS_9i.mkv" --append "docs\temp\BvS_10s_Windowboxed.mkv" --video-codec copy --audio-codec copy --output-format mkv --save "docs\temp\BvS_1.43.mkv" >> "docs\temp\processing.log" 2>&1
+	echo Assembly diagnostics and any questions appear in this window, not processing.log.
+	echo Answer only an explicit assembly question: y continues despite its warning; n declines.
+	echo Continuing does not establish codec compatibility or seamless joins.
+	docs\programs\avidemux\avidemux_cli --load "docs\temp\BvS_1i.mkv" --append "docs\temp\BvS_2s_Windowboxed.mkv" --append "docs\temp\BvS_3i.mkv" --append "docs\temp\BvS_4s_Windowboxed.mkv" --append "docs\temp\BvS_5i.mkv" --append "docs\temp\BvS_6s_Windowboxed.mkv" --append "docs\temp\BvS_7i.mkv" --append "docs\temp\BvS_8s_Windowboxed.mkv" --append "docs\temp\BvS_9i.mkv" --append "docs\temp\BvS_10s_Windowboxed.mkv" --video-codec copy --audio-codec copy --output-format mkv --save "docs\temp\BvS_1.43.mkv"
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_1.43.mkv"
@@ -573,7 +579,8 @@ popd
 exit /b 0
 
 :cleanup_incomplete
-echo An output was created; independent assembly validation passed.
+echo An output was created. Validation policy: %RESTORER_VALIDATION_MODE%.
+echo See docs\temp\assembly-check.txt for whether frame comparison ran and passed.
 echo Full restoration quality still needs review.
 echo Intermediate files and logs remain in "%~dp0docs\temp".
 echo Review or move them before starting another restoration.
@@ -625,18 +632,36 @@ endlocal & exit /b 0
 
 :: Verify decoded frame identity and order before final remux.
 :validate_assembly
+rem Unset policy is only for legacy development harnesses; selected entry requires it.
+if not defined RESTORER_VALIDATION_MODE set "RESTORER_VALIDATION_MODE=exhaustive"
+if /i "%RESTORER_VALIDATION_MODE%"=="basic" (
+ echo NOT RUN: exhaustive frame comparison was not selected.> "docs\temp\assembly-check.txt"
+ echo Basic checks only. Codec joins, frame identity, timing and HDR are not verified.
+ echo Stage: exhaustive assembly validation NOT RUN by explicit selection.>> "docs\temp\processing.log"
+ exit /b 0
+)
+if /i not "%RESTORER_VALIDATION_MODE%"=="exhaustive" exit /b 2
+echo RUNNING: exhaustive frame comparison.> "docs\temp\assembly-check.txt"
 echo Checking assembled video against every input, frame by frame.
-echo This can take a long time. This check does not repeat HandBrake encoding.
+echo This can take hours. No HandBrake encoding is repeated.
+echo Press Q in this window to cancel validation and stop processing; files are retained.
 set "stage_name=independent assembly validation: %~1"
-echo [%TIME%] Checking the assembled video...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
+echo Stage: !stage_name!>> "docs\temp\processing.log"
 if not exist "docs\scripts\Validate-Assembly.ps1" (
  echo Missing assembly validator.>> "docs\temp\processing.log"
+ echo NOT PASSED: assembly validator is missing.> "docs\temp\assembly-check.txt"
  exit /b 2
 )
-powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "docs\scripts\Validate-Assembly.ps1" -FFmpegPath "docs\programs\ffmpeg\ffmpeg.exe" -AssemblyPath "%~2" -InputListPath "docs\scripts\assembly-inputs-%~1.txt" -WorkDirectory "docs\temp\assembly-validation-%~1" >> "docs\temp\processing.log" 2>&1
-if errorlevel 1 exit /b 2
-if not errorlevel 0 exit /b 2
+powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "docs\scripts\Validate-Assembly.ps1" -FFmpegPath "docs\programs\ffmpeg\ffmpeg.exe" -AssemblyPath "%~2" -InputListPath "docs\scripts\assembly-inputs-%~1.txt" -WorkDirectory "docs\temp\assembly-validation-%~1"
+if errorlevel 1 (
+ echo NOT PASSED: validation failed or was cancelled.> "docs\temp\assembly-check.txt"
+ exit /b 2
+)
+if not errorlevel 0 (
+ echo NOT PASSED: validation process failed.> "docs\temp\assembly-check.txt"
+ exit /b 2
+)
+echo PASS: decoded video frames match ordered inputs. Timing, HDR and audio are not verified.> "docs\temp\assembly-check.txt"
 exit /b 0
 
 :: Structural output check only; does not qualify media contents.

@@ -20,8 +20,16 @@ class StageSource(unittest.TestCase):
             anchor='call :require_stage_output "docs\\temp\\BvS_'+mode+'.mkv"\n\tif errorlevel 1 goto stage_failed\n\tcall :validate_assembly "'+mode+'"'
             self.assertIn(anchor,TEXT)
 
+    def test_noninteractive_ffmpeg_and_visible_assembly(self):
+        for line in TEXT.splitlines():
+            if line.lstrip().startswith('docs\\programs\\ffmpeg\\ffmpeg '):
+                self.assertEqual(line.count(' -nostdin'), 1)
+            if line.lstrip().startswith('docs\\programs\\avidemux\\avidemux_cli '):
+                self.assertNotIn('processing.log', line)
+                self.assertNotIn('2>&1', line)
+
     def test_stage_gates_and_retention(self):
-        commands = re.findall(r'(?m)^\s*docs\\programs\\[^\n]+processing.log[^\n]*\n([^\n]+)\n([^\n]+)', TEXT)
+        commands = re.findall(r'(?m)^\s*docs\\programs\\(?:[^\n]+processing.log[^\n]*|avidemux\\avidemux_cli[^\n]*)\n([^\n]+)\n([^\n]+)', TEXT)
         self.assertEqual(len(commands), 36)
         for first, second in commands:
             self.assertIn('goto stage_', first)
@@ -42,7 +50,7 @@ class WindowsStages(unittest.TestCase):
     def tearDownClass(cls):
         cls.build.cleanup()
 
-    def run_mode(self, mode, fail=0, code=0, action='normal', omit=None, dialog='y', validator_code=0, missing_validator=False):
+    def run_mode(self, mode, fail=0, code=0, action='normal', omit=None, dialog='y', validator_code=0, missing_validator=False, assembly_question=False):
         with tempfile.TemporaryDirectory(prefix='stage with spaces ') as folder:
             root=Path(folder); (root/'docs/temp').mkdir(parents=True)
             for tool in ('mkvtoolnix/mkvmerge', 'ffmpeg/ffmpeg', 'handbrake/HandBrakeCLI', 'avidemux/avidemux_cli'):
@@ -53,11 +61,11 @@ class WindowsStages(unittest.TestCase):
                 # Exercise production invocation/status gate without decoding stub bytes.
                 (scripts/'Validate-Assembly.ps1').write_text('exit '+str(validator_code)+'\n')
             source=root/'synthetic source.mkv';source.write_bytes(b'original sentinel')
-            env=os.environ.copy();env.update(version=str(mode),dialog=dialog,dialog2='y',file=str(source) if dialog=='y' else '"'+str(source)+'"',folder=str(root),STAGE_TRACE=str(root/'trace'),STAGE_FAIL_AT=str(fail),STAGE_CODE=str(code),STAGE_ACTION=action)
+            env=os.environ.copy();env['RESTORER_VALIDATION_MODE']='exhaustive';env['STAGE_QUESTION']='yes' if assembly_question else '';env.update(version=str(mode),dialog=dialog,dialog2='y',file=str(source) if dialog=='y' else '"'+str(source)+'"',folder=str(root),STAGE_TRACE=str(root/'trace'),STAGE_FAIL_AT=str(fail),STAGE_CODE=str(code),STAGE_ACTION=action)
             harness='@echo off\nsetlocal EnableDelayedExpansion\npushd "%~dp0"\n'+PIPELINE
             harness=re.sub(r'(?im)^\s*PAUSE\s*$', 'rem noninteractive harness',harness)
             (root/'run.bat').write_bytes(harness.replace('\n','\r\n').encode())
-            result=subprocess.run(['cmd.exe','/d','/c','run.bat'],cwd=root,env=env,capture_output=True,text=True,timeout=30)
+            result=subprocess.run(['cmd.exe','/d','/c','run.bat'],cwd=root,env=env,capture_output=True,text=True,timeout=30,input='y\n' if assembly_question else None)
             trace=(root/'trace').read_text().splitlines() if (root/'trace').exists() else []
             files={p.name:p.read_bytes() for p in (root/'docs/temp').iterdir() if p.is_file()}
             self.assertEqual(source.read_bytes(),b'original sentinel')
@@ -88,6 +96,13 @@ class WindowsStages(unittest.TestCase):
                     result,_,kept=self.run_mode(mode,omit=tool)
                     self.assertEqual(result.returncode,2,result.stdout+result.stderr)
                     self.assertIn('processing.log',kept)
+
+    def test_assembly_question_is_visible_and_requires_explicit_answer(self):
+        result, trace, files = self.run_mode(1, assembly_question=True)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn('SYNTHETIC CODEC QUESTION', result.stderr)
+        self.assertIn('SYNTHETIC ANSWER: y', result.stdout)
+        self.assertNotIn(b'SYNTHETIC CODEC QUESTION', files['processing.log'])
 
     def test_manual_source_branch(self):
         for mode in (1,2):
