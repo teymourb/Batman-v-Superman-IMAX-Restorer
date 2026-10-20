@@ -159,7 +159,8 @@ class FingerprintWindows(unittest.TestCase):
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
         self.assertEqual(record.read_bytes(), b'previous evidence')
         multiple = self.root / 'multiple.mkv'
-        self.command([MKVMERGE, '-o', multiple, source, source])
+        second = self.clip(color='blue', name='second-video')
+        self.command([MKVMERGE, '-o', multiple, source, second])
         result, _ = self.gate(multiple)
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
 
