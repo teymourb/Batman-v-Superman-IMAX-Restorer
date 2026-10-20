@@ -110,37 +110,46 @@ On the 4K Blu-ray disc of BvS, the different types of scenes are encoded as foll
 [Reddit | r/fanedits Program thread](https://www.reddit.com/r/fanedits/comments/171rpft/beta_testing_fanedit_program_batman_v_superman/)  
 [fanedit.org | Forums Restoration thread](https://forums.fanedit.org/threads/batman-v-superman-dawn-of-justice-ultimate-edition-imax-1-43-1-1-78-1-restorations-4k-uhd-hdr10.29021/)
 
-## Maintenance candidate: temporary work
 
-The proposed 1.0.1 stops preparation, splitting, encoding and assembly when a
-tool reports failure or its expected output is missing or empty. Diagnostics go
-to `docs/temp/processing.log`; final remux diagnostics go to `final-remux.log`.
-The bundled Avidemux can report success after an append/save failure. Before
-final remux, an independent check now decodes the assembled video and every
-ordered input with the bundled FFmpeg, comparing decoded frame hashes in order.
-Missing, repeated, reordered or changed decoded frames stop the job. This adds
-a full decode of both the segments and assembly, so it can take substantial time.
-Reports and decode diagnostics remain under `docs/temp/assembly-validation-*`.
-Windows PowerShell runs the included check; no additional processing tool is
-installed. This comparison does not qualify timestamps, HDR metadata, framing,
-source edition, sound synchronization or the correctness of the original cuts.
+## Maintenance candidate 1.0.1 — not published
 
-All intermediates and logs are still retained, including after an output is
-created. Completion returns warning status 1 and asks you to review the result.
-Keep substantially more free disk space than previous versions: prepared video,
-raw splits, encoded splits, assembly and final output can coexist. There is no
-automatic resume. A new run stops if `docs/temp` already exists; after reviewing
-the output, move that folder somewhere safe before another restoration. A file
-left after a failure may be incomplete. Published 1.0.0 is unchanged.
+The film-processing recipe is preserved: the same cut points, crops/scaling,
+HandBrake encoding settings, Avidemux section order and copy-mode assembly.
+Processing tool versions are unchanged. This update improves setup, failure
+handling and evidence; it does not fix legacy codec/join compatibility.
 
-### Unreleased setup improvements
+Run the BAT and select source, existing output folder, restoration mode and an
+explicit check level before confirming:
 
-Start the BAT normally and follow source, output-folder and mode selection.
-Dialogs can be cancelled; choose manual entry or quit without starting processing.
-Pasted full paths may include surrounding quotes. Confirm the final summary to
-start. Existing outputs and workspaces are preserved. This batch version rejects
-paths containing `!`, `%`, `^`, embedded quotes or control characters; move/rename
-the program or input location if necessary. Spaces, Unicode, `&` and parentheses
-are supported. Keep the window open while processing; stage names appear there
-and detailed tool diagnostics go to `docs/temp/processing.log`. Do not restart or
-delete completed encodes after a failure: preserve logs and work for diagnosis.
+- **Routine:** tool exit statuses and required nonempty outputs are checked.
+  The decoded-frame assembly comparison is **NOT RUN**. This cannot establish
+  pristine joins, complete picture identity, timestamps, HDR or synchronization.
+- **Exhaustive:** additionally decode the assembly and ordered sections and
+  compare every decoded frame's fingerprint, pixel format and geometry. This
+  can take many hours. It still does not qualify intended edits, timing, HDR,
+  source identity or universal player compatibility. During decoding, progress
+  messages appear and the console offers Q to stop while retaining evidence.
+
+FFmpeg does not accept accidental keyboard commands during splitting. Avidemux
+runs visibly in the console so its codec-compatibility questions can be answered
+explicitly. A warning remains unresolved even if you choose to continue. Full
+Avidemux diagnostics appear in the console; processing.log records its stage and
+status, not a complete assembly transcript. Other processing diagnostics and
+validation reports remain in docs/temp; final mux logs are in final-remux.log.
+
+Tool failures or missing/empty outputs stop the job. The bundled Avidemux may
+return success after an incomplete save, so routine checks alone cannot prove
+assembly completeness. Check the selected level and assembly-check.txt; a NOT RUN
+record is never a PASS. Final completion still requests review and retains work.
+
+All intermediates remain, including after final output creation. Prepared video,
+raw/encoded sections, assembly and output may coexist; free-space figures are
+not a guarantee the job fits. There is no automatic resume or cleanup. A new run
+refuses an existing docs/temp or output. Keep completed encodes/logs after errors.
+
+Dialogs support cancel, manual path entry and quit. Spaces, Unicode, ampersands,
+brackets and parentheses are supported. Legacy batch paths containing !, %, ^,
+embedded quotes or control characters are rejected with guidance.
+Published 1.0.0 downloads remain unchanged. No source fingerprint registry or
+new encoding/join engine is introduced. Local source-only candidates require a
+separate complete trusted historical installation; they contain no tools/media.
