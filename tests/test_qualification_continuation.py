@@ -37,6 +37,17 @@ class Stub {
 }'''
 
 
+def windows_powershell_env(**extra):
+    # GitHub pwsh -> Python -> powershell.exe otherwise inherits PS7 modules;
+    # Windows PowerShell can select an incompatible Microsoft.PowerShell.Utility
+    # before its own module. Let 5.1 construct its native module search path.
+    # https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_psmodulepath
+    env = {key: value for key, value in os.environ.items()
+           if key.lower() != 'psmodulepath'}
+    env.update(extra)
+    return env
+
+
 @unittest.skipUnless(os.name == 'nt', 'requires actual Windows PowerShell 5.1')
 class ContinuationWindows(unittest.TestCase):
     @classmethod
@@ -81,7 +92,7 @@ class ContinuationWindows(unittest.TestCase):
             '[Console]::OutputEncoding=[Text.UTF8Encoding]::new($false); $i=Get-Item -LiteralPath $env:CONT_SOURCE; '
             '@{Source=$i.FullName;Length=$i.Length;Ticks=$i.LastWriteTimeUtc.Ticks;'
             'Phase="BeforeAssembly";VideoBytes=1}|ConvertTo-Json -Compress'],
-            env={**os.environ, 'CONT_SOURCE': str(source)}, text=True, encoding='utf-8')
+            env=windows_powershell_env(CONT_SOURCE=str(source)), text=True, encoding='utf-8')
         (temp / 'storage-qualification.json').write_text(metadata, encoding='utf-8')
         tools = root / 'docs/programs/mkvtoolnix'
         tools.mkdir(parents=True)
@@ -107,7 +118,7 @@ class ContinuationWindows(unittest.TestCase):
         root, destination, source, helper = setup
         before = {p.relative_to(root): p.read_bytes() for p in root.rglob('*') if p.is_file()}
         source_before = source.read_bytes()
-        env = dict(os.environ, STUB_ARGS=str(directory/'args.json'),
+        env = windows_powershell_env(STUB_ARGS=str(directory/'args.json'),
                    STUB_CALL=str(directory/'call.json'), STUB_EXIT=str(code),
                    STUB_EMPTY='1' if empty else '0', STUB_MISSING='1' if missing else '0')
         result = subprocess.run(['powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass',
@@ -213,7 +224,7 @@ class ContinuationWindows(unittest.TestCase):
                 'try {[Console]::WriteLine("LOCKED");[Console]::ReadLine()|Out-Null}'
                 'finally {$s.Dispose()}')
             holder = subprocess.Popen(['powershell.exe','-NoProfile','-Command',command],
-                env={**os.environ,'LOCK_STATE':str(state)}, stdin=subprocess.PIPE,
+                env=windows_powershell_env(LOCK_STATE=str(state)), stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             try:
                 self.assertEqual(holder.stdout.readline().strip(),'LOCKED')
