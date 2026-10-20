@@ -147,3 +147,52 @@ owner's running installation. A future storage launcher requires its own review.
 Existing output is checked again immediately before final remux, preserving a
 file created while encoding was running. This is not an atomic filesystem lock
 against an unrelated process creating the same path at the exact tool launch.
+
+## Owner-operated interrupted-qualification packaging
+
+`docs/scripts/Continue-Qualification.ps1` is a separate packaging experiment for
+an existing BvS 1.78 storage-qualification workspace at `BeforeAssembly` after
+assembly validation was interrupted. The production launcher never invokes it.
+It does not relax the production validation gate or establish any validation pass.
+
+Owner invocation in Windows PowerShell 5.1 (use the actual extracted installation
+and an existing destination outside docs/temp):
+
+```powershell
+& 'C:\path\to\Continue-Qualification.ps1' -InstallationRoot 'H:\Restorer\Testing\Batman-v-Superman-IMAX-Restorer_v1.0.0' -Destination 'H:\Restorer\Testing\BvS-output'
+```
+
+Stop the original launcher/validator first. The helper reads the existing storage
+JSON, requires unchanged source size/modification time and the fixed nonempty
+`docs/temp/BvS_1.78.mkv`, and pins the audited bundled MKVToolNix 78 executable.
+Metadata continuity is not source fingerprint verification. It rejects linked
+paths, unsupported destination filesystems and insufficient capacity. Its budget
+is assembly bytes + max(source bytes - recorded prepared-video bytes, 0) + 2 GiB
+mux allowance + 20 GiB reserve. Existing intermediates already occupy space and
+are never removed; a same-drive destination therefore uses the single remaining
+free-space pool, without adding fictitious space from deletions.
+
+Read the warning and type `PACKAGE` only to request an explicitly UNQUALIFIED
+output. Any other response cancels with exit 3 before creating an output directory.
+The tool reserves a new GUID-named child destination, retains partial outputs and
+records input metadata, tool SHA256, arguments, stdout/stderr and completed status
+there. Logs stream to disk while packaging runs; elapsed-time messages appear
+every ten seconds. Cancellation attempts to terminate only its own mkvmerge child
+and leaves the start-only result and partial output unqualified. Use Ctrl+C for
+normal cancellation; forcibly closing the host or terminating it in Task Manager
+cannot guarantee child cleanup. Check for a surviving mkvmerge before retrying,
+and never blindly restart the production launcher. It reuses the
+production 1.78 final-remux selection arguments through a
+UTF-8 JSON response file; there is no encoding. Read-only source/state/assembly/tool
+handles exclude concurrent writers during packaging; the state handle also
+excludes concurrent continuation launches without writing to the state file. The active-media-process
+check is advisory and cannot establish that every unrelated process is idle.
+Do not modify files while it runs. Existing source files, intermediates, logs and
+storage state are preserved.
+
+Exit 0 means mkvmerge returned 0 and produced a nonempty file; 1 means warning
+status with a nonempty file; 2 means failure. Neither 0 nor 1 qualifies assembly,
+source identity, codec joins, timestamps, HDR, synchronization or playback. The
+new file is labelled UNQUALIFIED and must not be presented as a release-qualified
+restoration. A start-only result without completed-result.txt means interrupted
+packaging. This operation is not a general resume feature or normal user workflow.
