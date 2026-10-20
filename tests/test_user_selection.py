@@ -188,14 +188,15 @@ class WindowsSelection(unittest.TestCase):
                 self.assertFalse((install / 'called.txt').exists())
 
     def test_fingerprint_failure_stops_before_any_processing(self):
-        with tempfile.TemporaryDirectory() as td:
-            install, launcher, source, destination = self.make_case(Path(td))
-            (install / 'docs/scripts/Test-SourceFingerprint.ps1').write_text(
-                "Write-Host 'Synthetic fingerprint mismatch: restoration not started.'\nexit 2\n")
-            answers = str(source) + '\n' + str(destination) + '\n1\ny\n'
-            result = self.invoke(install, launcher, source, destination, answers=answers)
-            self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
-            self.assertIn('Synthetic fingerprint mismatch', result.stdout)
-            self.assertFalse((install / 'called.txt').exists(), 'processing tool ran after rejected source')
-            self.assertEqual(list(destination.iterdir()), [])
-            self.assertEqual(source.read_bytes(), b'synthetic original')
+        for status in (2, -1, -1073741819):
+            with self.subTest(status=status), tempfile.TemporaryDirectory() as td:
+                install, launcher, source, destination = self.make_case(Path(td))
+                (install / 'docs/scripts/Test-SourceFingerprint.ps1').write_text(
+                    "Write-Host 'Synthetic fingerprint mismatch: restoration not started.'\nexit %s\n" % status)
+                answers = str(source) + '\n' + str(destination) + '\n1\ny\n'
+                result = self.invoke(install, launcher, source, destination, answers=answers)
+                self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+                self.assertIn('Synthetic fingerprint mismatch', result.stdout)
+                self.assertFalse((install / 'called.txt').exists(), 'processing tool ran after rejected source')
+                self.assertEqual(list(destination.iterdir()), [])
+                self.assertEqual(source.read_bytes(), b'synthetic original')

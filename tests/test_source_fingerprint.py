@@ -27,7 +27,7 @@ class FingerprintSource(unittest.TestCase):
         self.assertNotRegex(parameters.lower(), 'expected|skip|override|bypass')
         launcher = next(ROOT.glob('*Restorer.bat')).read_text()
         self.assertLess(launcher.index('Test-SourceFingerprint.ps1'), launcher.index('::Making sure'))
-        self.assertIn('if errorlevel 1', launcher[launcher.index('Test-SourceFingerprint.ps1'):].split('::Making sure')[0])
+        self.assertIn('if not "%fingerprint_result%"=="0"', launcher[launcher.index('Test-SourceFingerprint.ps1'):].split('::Making sure')[0])
 
 @unittest.skipUnless(os.name == 'nt' and FFMPEG and MKVMERGE,
                      'requires Windows and verified bundled FFmpeg/MKVToolNix')

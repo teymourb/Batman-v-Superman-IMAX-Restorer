@@ -22,7 +22,8 @@ if not exist "docs\scripts\Test-SourceFingerprint.ps1" (
     exit /b 2
 )
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "docs\scripts\Test-SourceFingerprint.ps1" -Film BvS -Source "%file%" -WorkDirectory "docs\temp"
-if errorlevel 1 (
+set "fingerprint_result=%errorlevel%"
+if not "%fingerprint_result%"=="0" (
     echo Source verification did not complete successfully. Processing has stopped.
     pause
     exit /b 2
