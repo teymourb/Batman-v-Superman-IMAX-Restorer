@@ -1,3 +1,19 @@
+# Fingerprint implementation in progress — 2026-10-20
+
+A mandatory source-video fingerprint gate is being added after workspace creation
+and before video preparation. `docs/scripts/Test-SourceFingerprint.ps1` identifies
+exactly one video track using MKVToolNix JSON, extracts that identified track, and
+compares a film-specific compressed-stream SHA256. BvS uses bundled FFmpeg stream
+copy with HEVC AUD/RPU NAL types 35/62 removed for the comparison only; Asteroid
+uses the extracted AVC bytes. The source and restoration inputs are unchanged.
+This does not decode frames, certify timing/HDR/output quality, or authorize
+private-media access. Details/evidence are recorded in `docs/SOURCE-FINGERPRINT.md`.
+
+The helper is a required runtime payload. Candidate builds must include it beside
+Select-Restoration.ps1; developer qualification tools remain excluded. Current
+implementation is not Windows-qualified until the new tests and final CI results
+are recorded. Do not infer RC readiness from historical passing runs below.
+
 # Current public/developer boundary — 2026-10-20
 
 The owner requested removal of developer qualification from the public program.

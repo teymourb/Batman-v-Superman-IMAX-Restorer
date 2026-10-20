@@ -10,7 +10,7 @@ import unittest
 from test_final_remux import TEXT
 
 # Exercise workspace functions independently of interactive selection.
-STARTUP = '@echo off\nsetlocal DisableDelayedExpansion\n' + TEXT.split('call :prepare_workspace', 1)[1].split('::Making sure', 1)[0]
+STARTUP = '@echo off\nsetlocal DisableDelayedExpansion\n' + TEXT.split('call :prepare_workspace', 1)[1].split('if not exist \"docs\\scripts\\Test-SourceFingerprint.ps1\"', 1)[0]
 STARTUP = STARTUP.replace('if errorlevel 1 exit /b 2', 'call :prepare_workspace\nif errorlevel 1 exit /b 2', 1)
 # This harness isolates workspace handling, which supports ! in installation paths.
 # Interactive setup's stricter path validation and processing expansion are separate.
