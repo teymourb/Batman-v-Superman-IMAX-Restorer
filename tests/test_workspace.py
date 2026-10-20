@@ -15,7 +15,7 @@ STARTUP = STARTUP.replace('if errorlevel 1 exit /b 2', 'call :prepare_workspace\
 # This harness isolates workspace handling, which supports ! in installation paths.
 # Interactive setup's stricter path validation and processing expansion are separate.
 STARTUP = STARTUP.replace('setlocal EnableDelayedExpansion\n', '')
-SUCCESS = TEXT[TEXT.index('echo Restoration complete.'):].split(':: Workspace helpers:', 1)[0]
+SUCCESS = TEXT[TEXT.index('echo [OK] Restoration complete.'):].split(':: Workspace helpers:', 1)[0]
 HELPERS = TEXT.split(':: Workspace helpers:', 1)[1].split('\n:remux_warning', 1)[0]
 HANDLERS = ':remux_warning' + TEXT.split('\n:remux_warning', 1)[1]
 

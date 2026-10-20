@@ -1,3 +1,10 @@
+## Console presentation — unreleased
+
+Group setup and results with ASCII headings and spacing. Wrap long displayed
+paths without changing their values. Show one shared free-space figure for a
+shared drive. Source-check elapsed progress updates in place on an interactive
+console; redirected logs remain ordinary lines. Processing recipes are unchanged.
+
 ## Mandatory source recognition — unreleased
 
 Check the supported compressed video before restoration starts. BvS recognizes
