@@ -1,3 +1,18 @@
+# Console presentation and local packaging — 2026-10-20
+
+The owner-approved ASCII layout groups setup, choices, paths, storage and results.
+Wrapped path strings are display-only; selected values and processing arguments
+are unchanged. The source-check heartbeat updates one bounded line on interactive
+consoles and remains newline-delimited when redirected. Windows regression is
+required for the current presentation revision; owner source matching and Q
+cancellation were already demonstrated for the preceding fingerprint source.
+
+Full-package builders preserve retained runtime bytes, use audited historical
+archives, include the new helpers and official HandBrake notices, and verify ZIP
+payload hashes/CRCs. Outputs are local review packages, not approved publication.
+Corresponding-source/build records and Asteroid logo packaging remain separate
+from source behavior qualification.
+
 # Mandatory fingerprint implementation — 2026-10-20
 
 The mandatory source-video fingerprint gate runs after workspace creation

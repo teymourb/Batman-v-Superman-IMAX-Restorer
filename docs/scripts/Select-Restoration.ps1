@@ -15,6 +15,40 @@ $ErrorActionPreference = 'Stop'
 if ([Console]::IsInputRedirected) { [Console]::InputEncoding = New-Object Text.UTF8Encoding($false) }
 if ([Console]::IsOutputRedirected) { [Console]::OutputEncoding = New-Object Text.UTF8Encoding($false) }
 $root = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
+# Presentation only: wrap displayed text without changing stored paths or answers.
+function Show-Wrapped([string]$Text, [int]$Indent = 2) {
+    $width = 72
+    try { if (-not [Console]::IsOutputRedirected) { $width = [Math]::Max(40, [Math]::Min(72, [Console]::WindowWidth - 1)) } } catch { }
+    $limit = $width - $Indent
+    $remaining = $Text
+    $prefix = ' ' * $Indent
+    while ($remaining.Length -gt $limit) {
+        $cut = $remaining.LastIndexOf(' ', $limit)
+        if ($cut -le 0) { $cut = $limit }
+        Write-Host ($prefix + $remaining.Substring(0, $cut))
+        $remaining = $remaining.Substring($cut).TrimStart()
+    }
+    Write-Host ($prefix + $remaining)
+}
+function Show-Heading([string]$Text) {
+    Write-Host ''
+    Write-Host ('-' * 60)
+    Show-Wrapped ($Text.ToUpperInvariant())
+    Write-Host ('-' * 60)
+    Write-Host ''
+}
+function Show-Banner([string]$Text) {
+    Write-Host ''
+    Write-Host ('=' * 60)
+    Show-Wrapped $Text
+    Write-Host ('=' * 60)
+    Write-Host ''
+}
+function Show-Field([string]$Label, [string]$Value) {
+    Write-Host ''
+    Write-Host ($Label.ToUpperInvariant() + ':')
+    Show-Wrapped $Value
+}
 function Read-Answer([string]$Prompt) {
     $answer = Read-Host $Prompt
     if ([string]::IsNullOrWhiteSpace($answer) -or $answer.Trim() -eq 'q') { throw [OperationCanceledException]::new('Cancelled. No processing started.') }
@@ -94,20 +128,25 @@ try {
         if ($env:RESTORER_SELECTION_READY -ne '1' -or $env:dialog -ne 'y' -or $env:dialog2 -ne 'y') { throw 'Selection is missing. Start the launcher normally.' }
     } elseif (-not $ValidateOnly) {
         if ($Film -eq 'BvS') {
-            Write-Host '=== Batman v Superman: Dawn of Justice Ultimate Edition IMAX Restorer ==='
-            Write-Host 'Restore your preferred constant-width IMAX presentation with HDR10.'
-            Write-Host 'Required source: an MKV rip of the 4K Ultra HD Blu-ray (2021 Remaster).'
+            Show-Banner 'Batman v Superman: Dawn of Justice Ultimate Edition IMAX Restorer'
+            Show-Wrapped 'Restore your preferred constant-width IMAX presentation with HDR10.'
+            Show-Heading 'Required source'
+            Show-Wrapped 'An MKV rip of the 4K Ultra HD Blu-ray (2021 Remaster).'
         } else {
-            Write-Host '=== Asteroid City Theatrical Scope Restorer ==='
-            Write-Host 'Restore your preferred constant-height Scope theatrical presentation.'
-            Write-Host 'Required source: an MKV rip of the Asteroid City Blu-ray disc.'
+            Show-Banner 'Asteroid City Theatrical Scope Restorer'
+            Show-Wrapped 'Restore your preferred constant-height Scope theatrical presentation.'
+            Show-Heading 'Required source'
+            Show-Wrapped 'An MKV rip of the Asteroid City Blu-ray disc.'
         }
-        Write-Host 'Only the unaltered video track from this specific disc is supported.'
-        if ($Film -eq 'BvS') { Write-Host 'Source matching ignores added Dolby Vision RPU metadata; this restorer targets HDR10 output.' }
-        Write-Host 'No other version will work. You may keep whichever audio and subtitle tracks you wish in your rip.'
-        Write-Host 'Your original MKV is not modified. The restoration is saved as a separate file.'
-        Write-Host 'No processing has started. At a text prompt, enter q or leave it blank to quit.'
-        Write-Host 'Step 1 of 3: select your source MKV in the file dialog.'
+        Show-Wrapped 'Only the unaltered video track from this specific disc is supported.'
+        if ($Film -eq 'BvS') { Show-Wrapped 'Source matching ignores added Dolby Vision RPU metadata; this restorer targets HDR10 output.' }
+        Show-Wrapped 'No other version will work. You may keep whichever audio and subtitle tracks you wish in your rip.'
+        Write-Host ''
+        Show-Wrapped 'Your original MKV is not modified. The restoration is saved as a separate file.'
+        Write-Host ''
+        Show-Wrapped 'No processing has started. At a text prompt, enter q or leave it blank to quit.'
+        Show-Heading 'Step 1 of 3 - Source MKV'
+        Show-Wrapped 'Select your source MKV in the file dialog.'
         while ($true) {
             try {
                 $Source = Get-PathValue (Select-Path $true)
@@ -115,7 +154,9 @@ try {
                 break
             } catch [OperationCanceledException] { throw } catch { Write-Host ('Source: ' + $_.Exception.Message) }
         }
-        Write-Host 'Step 2 of 3: select the folder where the restored MKV will be saved.'
+        Show-Field 'Selected source' $Source
+        Show-Heading 'Step 2 of 3 - Output folder'
+        Show-Wrapped 'Select the folder where the restored MKV will be saved.'
         while ($true) {
             try {
                 $Destination = Get-PathValue (Select-Path $false)
@@ -123,19 +164,26 @@ try {
                 break
             } catch [OperationCanceledException] { throw } catch { Write-Host ('Destination: ' + $_.Exception.Message) }
         }
+        Show-Field 'Selected output folder' $Destination
+        Show-Heading 'Step 3 of 3 - Restoration'
         if ($Film -eq 'BvS') {
-            Write-Host 'Step 3 of 3: choose your constant-width IMAX restoration.'
-            Write-Host '1: IMAX 1.78:1 - IMAX scenes vertically centre-cropped and upscaled to fill 16:9.'
-            Write-Host '   Scope scenes remain unchanged. Best suited for 16:9 screens.'
-            Write-Host '2: IMAX 1.43:1 (unmasked) - Scope scenes downscaled and windowboxed in a 16:9 container.'
-            Write-Host '   IMAX scenes remain unchanged. Preserves the full height of the IMAX image.'
+            Show-Wrapped 'Choose your constant-width IMAX restoration.'
+            Write-Host ''
+            Show-Wrapped '[1] IMAX 1.78:1'
+            Show-Wrapped 'IMAX scenes vertically centre-cropped and upscaled to fill 16:9. Scope scenes remain unchanged. Best suited for 16:9 screens.' 6
+            Write-Host ''
+            Show-Wrapped '[2] IMAX 1.43:1 (unmasked)'
+            Show-Wrapped 'Scope scenes downscaled and windowboxed in a 16:9 container. IMAX scenes remain unchanged. Preserves the full height of the IMAX image.' 6
         } else {
-            Write-Host 'Step 3 of 3: choose your constant-height Scope theatrical restoration.'
-            Write-Host '1: Scope Theatrical (unmasked) - Black and White scenes downscaled and windowboxed.'
-            Write-Host '   Keeps the 16:9 container; Blu-ray compliant.'
-            Write-Host '2: Scope Theatrical (masked) - Black and White scenes downscaled and pillarboxed.'
-            Write-Host '   Uses a 2.39:1 container with the top and bottom black bars removed.'
+            Show-Wrapped 'Choose your constant-height Scope theatrical restoration.'
+            Write-Host ''
+            Show-Wrapped '[1] Scope Theatrical (unmasked)'
+            Show-Wrapped 'Black and White scenes downscaled and windowboxed. Keeps the 16:9 container; Blu-ray compliant.' 6
+            Write-Host ''
+            Show-Wrapped '[2] Scope Theatrical (masked)'
+            Show-Wrapped 'Black and White scenes downscaled and pillarboxed. Uses a 2.39:1 container with the top and bottom black bars removed.' 6
         }
+        Write-Host ''
         while ($true) {
             $Mode = Read-Answer 'Choose 1 or 2'
             if ($Mode -in @('1','2')) { break }
@@ -144,31 +192,35 @@ try {
     }
     Check-Selection
     if ($ValidateOnly -or $ValidateEnvironment) { exit 0 }
-    Write-Host 'Review your restoration before starting:'
-    Write-Host "Source: $Source"
-    Write-Host "Output: $ExpectedOutput"
+    Show-Banner 'REVIEW YOUR RESTORATION'
     $modeName = if ($Film -eq 'BvS') {
         if ($Mode -eq '1') { 'IMAX 1.78:1 (constant-width; IMAX scenes vertically centre-cropped)' } else { 'IMAX 1.43:1 (constant-width; unmasked 16:9 container)' }
     } else {
         if ($Mode -eq '1') { 'Scope Theatrical (constant-height; unmasked 16:9 container)' } else { 'Scope Theatrical (constant-height; masked 2.39:1 container)' }
     }
-    Write-Host "Restoration: $modeName"
-    Write-Host "Working files: $(Join-Path $root 'docs\temp')"
+    Show-Field 'Restoration' $modeName
+    Show-Field 'Source' $Source
+    Show-Field 'Output folder' $Destination
+    Show-Field 'Output filename' ([IO.Path]::GetFileName($ExpectedOutput))
+    Show-Field 'Working folder' (Join-Path $root 'docs\temp')
+    Show-Heading 'Storage'
     $sourceBytes = (Get-Item -LiteralPath $Source).Length
     Write-Host ('Source size: {0:N2} GiB ({1} bytes).' -f ($sourceBytes / 1GB), $sourceBytes)
-    Show-AvailableSpace 'working drive' $root
-    Show-AvailableSpace 'destination drive' $Destination
     if ([string]::Equals([IO.Path]::GetPathRoot($root), [IO.Path]::GetPathRoot($Destination), [StringComparison]::OrdinalIgnoreCase)) {
-        Write-Host 'Working files and final output share the same free-space pool; do not add the two figures.'
+        Show-AvailableSpace 'working files and final output' $root
+        Write-Host 'Working files and final output share this available space.'
     } else {
+        Show-AvailableSpace 'working drive' $root
+        Show-AvailableSpace 'destination drive' $Destination
         Write-Host 'Working files and final output use separate drive locations.'
     }
-    Write-Host 'Before restoration, the source check temporarily extracts the video track and then removes that extraction.'
-    Write-Host 'Allow free space approximately equal to the source MKV size plus 1 GiB for that check.'
-    Write-Host 'Allow room for several large temporary video files as well as the final MKV.'
-
-    Write-Host 'Temporary videos and logs are kept in the working folder after processing.'
-    Write-Host 'Processing can take several hours. Keep this window open and your PC awake.'
+    Show-Heading 'Before you start'
+    Show-Wrapped '- Before restoration, the source check temporarily extracts the video track and then removes that extraction.'
+    Show-Wrapped '- Allow free space approximately equal to the source MKV size plus 1 GiB for that check.'
+    Show-Wrapped '- Allow room for several large temporary video files as well as the final MKV.'
+    Show-Wrapped '- Temporary videos and logs are kept in the working folder after processing.'
+    Show-Wrapped '- Processing can take several hours. Keep this window open and your PC awake.'
+    Show-Heading 'Y - start / N or Q - quit'
     while ($true) {
         $answer = Read-Answer 'Start processing? Enter y to start, or n/q to quit'
         if ($answer -eq 'n') { throw [OperationCanceledException]::new('Cancelled. No processing started.') }

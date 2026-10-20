@@ -9,6 +9,21 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 if ([string]::IsNullOrWhiteSpace($InstallationRoot)) { $InstallationRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..')) }
+# Presentation only: update one bounded line in an interactive console.
+# Redirected output remains ordinary newline-delimited text for logs and tests.
+$script:progressActive = $false
+function Complete-SourceProgress {
+    if ($script:progressActive) { Write-Host ''; $script:progressActive = $false }
+}
+function Write-SourceProgress([string]$Text) {
+    if ([Console]::IsOutputRedirected) { Write-Host $Text; return }
+    try { $width = [Math]::Min(120, [Console]::WindowWidth - 1) }
+    catch { Write-Host $Text; return }
+    if ($width -lt 20) { Write-Host $Text; return }
+    $line = if ($Text.Length -gt $width) { $Text.Substring(0,$width - 3) + '...' } else { $Text }
+    Write-Host -NoNewline ("`r" + $line.PadRight($width))
+    $script:progressActive = $true
+}
 function Get-Sha256([string]$Path) {
     $stream = [IO.File]::OpenRead($Path); $sha = [Security.Cryptography.SHA256]::Create()
     try { return ([BitConverter]::ToString($sha.ComputeHash($stream))).Replace('-','').ToLowerInvariant() }
@@ -55,7 +70,7 @@ function Invoke-CheckedTool([string]$Tool, [string[]]$Arguments, [string]$Stage,
         while (-not $process.WaitForExit(250)) {
             Check-Cancellation
             if ($timer.Elapsed.TotalSeconds -ge $next) {
-                Write-Host ("Checking source: {0}; elapsed {1} seconds. No encoding. Press Q to cancel." -f $Stage, [int]$timer.Elapsed.TotalSeconds)
+                Write-SourceProgress ("Checking source: {0}; elapsed {1} seconds. No encoding. Press Q to cancel." -f $Stage, [int]$timer.Elapsed.TotalSeconds)
                 $next += 10
             }
         }
@@ -64,6 +79,7 @@ function Invoke-CheckedTool([string]$Tool, [string[]]$Arguments, [string]$Stage,
         $null = $errCopy.GetAwaiter().GetResult()
         if ($process.ExitCode -ne 0) { throw "$Stage failed or reported warnings (exit $($process.ExitCode)). See $script:diagnostics" }
     } finally {
+        Complete-SourceProgress
         try { if ($started -and -not $process.HasExited) { $process.Kill(); $process.WaitForExit() } }
         finally {
             try { if ($outCopy) { $null = $outCopy.GetAwaiter().GetResult() }; if ($errCopy) { $null = $errCopy.GetAwaiter().GetResult() } }
@@ -105,6 +121,10 @@ try {
     $ffmpeg = Join-Path $root 'docs\programs\ffmpeg\ffmpeg.exe'
     $tools = @($merge,$extract); if ($Film -eq 'BvS') { $tools += $ffmpeg }
     foreach ($tool in $tools) { if (-not [IO.File]::Exists($tool)) { throw "Required bundled tool is missing: $tool" } }
+    Write-Host ''
+    Write-Host '----------------------------------------------------------------'
+    Write-Host 'SOURCE VIDEO CHECK'
+    Write-Host '----------------------------------------------------------------'
     Write-Host 'Checking that the video matches the supported source. The original is unchanged.'
     Write-Host 'This reads the video without encoding it. A temporary extracted track is removed after this check.'
     Write-Host ("Press Q to cancel. Diagnostic records are retained in: {0}" -f $work.FullName)
@@ -137,32 +157,42 @@ try {
             $buffer = New-Object byte[] (4MB); $timer = [Diagnostics.Stopwatch]::StartNew(); $next=10
             while (($count=$stream.Read($buffer,0,$buffer.Length)) -gt 0) {
                 $null = $sha.TransformBlock($buffer,0,$count,$buffer,0); Check-Cancellation
-                if ($timer.Elapsed.TotalSeconds -ge $next) { Write-Host ("Hashing source video; elapsed {0} seconds. No encoding. Press Q to cancel." -f [int]$timer.Elapsed.TotalSeconds); $next+=10 }
+                if ($timer.Elapsed.TotalSeconds -ge $next) { Write-SourceProgress ("Hashing source video; elapsed {0} seconds. No encoding. Press Q to cancel." -f [int]$timer.Elapsed.TotalSeconds); $next+=10 }
             }
             $null = $sha.TransformFinalBlock($buffer,0,0)
             $actual = ([BitConverter]::ToString($sha.Hash)).Replace('-','').ToLowerInvariant()
-        } finally { $stream.Dispose(); $sha.Dispose() }
+        } finally { Complete-SourceProgress; $stream.Dispose(); $sha.Dispose() }
     }
     $record.actual_sha256 = $actual
     if ($actual -ne $expected) { $record.status='MISMATCH'; throw 'The video does not match the supported source. Restoration has not started. Choose the required unaltered disc video; audio and subtitle differences are allowed.' }
     $record.status='MATCH'; $exitCode=0
 } catch [OperationCanceledException] {
-    $record.status='CANCELLED'; $record.error=$_.Exception.Message; Write-Host $_.Exception.Message; $exitCode=3
+    $record.status='CANCELLED'; $record.error=$_.Exception.Message; Complete-SourceProgress; Write-Host ''; Write-Host '================================================================'; Write-Host ('[STOP] ' + $_.Exception.Message); Write-Host '================================================================'; $exitCode=3
 } catch {
     if ($record.status -ne 'MISMATCH') { $record.status='FAILED' }
     $record.error=$_.Exception.Message
-    Write-Host ('Source check stopped: ' + $_.Exception.Message)
+    Complete-SourceProgress
+    Write-Host ''
+    Write-Host '================================================================'
+    Write-Host ('[STOP] Source check stopped: ' + $_.Exception.Message)
+    Write-Host '================================================================'
     Write-Host 'Restoration has not started. Keep the diagnostics for troubleshooting.'
 } finally {
     if ($sourceHandle) { $sourceHandle.Dispose() }
     if ($scratch -and [IO.File]::Exists($scratch)) {
-        try { [IO.File]::Delete($scratch) } catch { $record.cleanup_error=$_.Exception.Message; $record.status='FAILED'; $exitCode=2; Write-Host 'Temporary source extraction could not be removed. Keep the workspace for review.' }
+        try { [IO.File]::Delete($scratch) } catch { $record.cleanup_error=$_.Exception.Message; $record.status='FAILED'; $exitCode=2; Write-Host '[STOP] Temporary source extraction could not be removed. Keep the workspace for review.' }
     }
     if ($recordPath -and -not [IO.File]::Exists($recordPath)) {
         $record.completed_utc=[DateTime]::UtcNow.ToString('o')
         try { $json=$record | ConvertTo-Json -Depth 8; $stream=[IO.File]::Open($recordPath,'CreateNew','Write','Read'); try { $writer=New-Object IO.StreamWriter($stream,[Text.UTF8Encoding]::new($false)); $writer.Write($json); $writer.Flush() } finally { $stream.Dispose() } }
-        catch { Write-Host ('Cannot save source-check record: '+$_.Exception.Message); $exitCode=2 }
+        catch { Write-Host ('[STOP] Cannot save source-check record: '+$_.Exception.Message); $exitCode=2 }
     }
 }
-if ($exitCode -eq 0) { Write-Host 'Source video matches.' }
+Complete-SourceProgress
+if ($exitCode -eq 0) {
+    Write-Host ''
+    Write-Host '================================================================'
+    Write-Host '[OK] Source video matches.'
+    Write-Host '================================================================'
+}
 exit $exitCode
