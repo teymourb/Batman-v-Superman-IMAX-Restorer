@@ -153,6 +153,7 @@ class WindowsSelection(unittest.TestCase):
                 self.assertIn('Restoration complete.', result.stdout)
                 name = 'Batman v Superman Dawn of Justice Ultimate Edition IMAX ' + ('1.78.mkv' if mode == '1' else '1.43 (unmasked).mkv')
                 self.assertTrue((destination / name).is_file(), result.stdout + result.stderr)
+                self.assertIn(name, result.stdout.split('Restoration complete.', 1)[1])
                 self.assertEqual(source.read_bytes(), b'synthetic original')
                 self.assertFalse((install / 'docs/temp/assembly-check.txt').exists())
                 self.assertIn('Source size:', result.stdout)

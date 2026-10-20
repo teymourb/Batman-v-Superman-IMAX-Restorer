@@ -503,7 +503,7 @@ if %version%==1 (
 
 echo.
 echo Restoration complete.
-echo Output: "!completed_output!"
+echo Output: "%completed_output%"
 echo The final MKV contains the restored video and the selected original audio and subtitles.
 echo Working files and logs remain in "%~dp0docs\temp".
 echo Move that folder aside before starting another restoration.
