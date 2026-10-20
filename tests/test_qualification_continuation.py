@@ -13,7 +13,7 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-HELPER = ROOT / 'docs/scripts/Continue-Qualification.ps1'
+HELPER = ROOT / 'tools/qualification/Continue-Qualification.ps1'
 PIN = 'f707365fc6374db58c875d69fe8d3c3f572ab54369b28a863bc9aaad3ebc09ef'
 STUB = r'''
 using System;

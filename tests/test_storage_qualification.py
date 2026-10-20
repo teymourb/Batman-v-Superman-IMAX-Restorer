@@ -61,7 +61,7 @@ class StorageWindows(unittest.TestCase):
         scripts=root/'docs/scripts'; scripts.mkdir()
         for name in ('mkvtoolnix/mkvmerge','ffmpeg/ffmpeg','handbrake/HandBrakeCLI','avidemux/avidemux_cli'):
             dest=root/'docs/programs'/(name+'.exe'); dest.parent.mkdir(parents=True,exist_ok=True); shutil.copyfile(self.stub,dest)
-        helper=(ROOT/'docs/scripts/Storage-Qualification-Checkpoint.ps1').read_text()
+        helper=(ROOT/'tools/qualification/Storage-Qualification-Checkpoint.ps1').read_text()
         # Model disk capacity and owner response only; execute actual guards/deletion on real files.
         self.assertEqual(helper.count('return $drive.AvailableFreeSpace'),1)
         helper=helper.replace('return $drive.AvailableFreeSpace','return [long]'+str(space))

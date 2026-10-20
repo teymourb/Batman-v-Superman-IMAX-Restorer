@@ -1,3 +1,28 @@
+# Current public/developer boundary — 2026-10-20
+
+The owner requested removal of developer qualification from the public program.
+The launcher now asks only for the required source, output folder, restoration
+and confirmation. It never invokes frame comparison or asks for a check level.
+Frame comparison and its manifests are developer tools under `tools/qualification`;
+BvS storage and continuation helpers are also separate developer experiments.
+They are excluded from the application payload. There is no public validation
+report or skipped-test status. Processing exit/output/input safeguards remain.
+Successful completion returns 0; actual MKVToolNix warnings retain their warning
+status. Retaining temporary files alone is not a warning. All intermediates are
+still retained: no cleanup or automatic resume has been introduced.
+
+Cuts, requested frame counts, transformations, HandBrake settings, Avidemux
+section order and tool versions remain unchanged. FFmpeg uses -nostdin and
+Avidemux questions remain visible. This does not resolve codec/join uncertainty.
+Windows evidence for this revision must be recorded before validated merge;
+earlier results below qualify their historical source revisions only.
+
+## Historical implementation/evidence record
+
+The following dated sections describe prior work, including the now withdrawn
+public validation-level design. They are retained as development history and
+must not be read as the current application workflow or release instructions.
+
 # Development status — 2026-10-19
 
 ## Current state and authorization
@@ -24,7 +49,7 @@ stops for review; failures return 2. Stage markers and tool diagnostics go to
 processing.log; final-remux diagnostics go to final-remux.log in docs/temp.
 
 When exhaustive checking is selected, before final remux
-`docs/scripts/Validate-Assembly.ps1` reads the mode-specific
+`tools/qualification/Validate-Assembly.ps1` reads the mode-specific
 ordered manifest and uses the bundled FFmpeg to compare decoded frame hashes
 of the segments, in order, against the assembly. Missing validator/tool, process
 failures, decoder errors, malformed reports and mismatches stop processing and
@@ -151,7 +176,7 @@ against an unrelated process creating the same path at the exact tool launch.
 
 ## Owner-operated interrupted-qualification packaging
 
-`docs/scripts/Continue-Qualification.ps1` is a separate packaging experiment for
+`tools/qualification/Continue-Qualification.ps1` is a separate packaging experiment for
 an existing BvS 1.78 storage-qualification workspace at `BeforeAssembly` after
 assembly validation was interrupted. The production launcher never invokes it.
 It does not relax the production validation gate or establish any validation pass.

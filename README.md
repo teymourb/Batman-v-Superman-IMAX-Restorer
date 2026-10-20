@@ -29,7 +29,7 @@ Choose between 2 **constant-width** IMAX Restorations:
 
 #### INSTRUCTIONS:  
 - Extract the complete application folder to a drive with room for the prepared video, raw and encoded segments, assembled video and final output. The unreleased maintenance version retains all of these; the historical free-space figure above is not its storage requirement.
-- Launch *Batman-v-Superman-IMAX-Restorer.bat* and disregard the unknow publisher prompt  
+- Launch *Batman-v-Superman-IMAX-Restorer.bat* and disregard the unknown publisher prompt
 - Select your source rip .mkv file when prompted  
 - Select your destination folder for the output file  
 - If Avidemux asks a codec-compatibility question, read it and choose deliberately. Continuing does not establish that the join is compatible.
@@ -113,43 +113,39 @@ On the 4K Blu-ray disc of BvS, the different types of scenes are encoded as foll
 
 ## Maintenance candidate 1.0.1 — not published
 
-The film-processing recipe is preserved: the same cut points, crops/scaling,
-HandBrake encoding settings, Avidemux section order and copy-mode assembly.
-Processing tool versions are unchanged. This update improves setup, failure
-handling and evidence; it does not fix legacy codec/join compatibility.
+This update makes setup and error handling clearer. Select the required source
+MKV, an existing output folder and your preferred restoration, then review the
+summary before starting. If a file/folder dialog is unavailable or cancelled,
+you can enter a path manually or quit without starting processing.
 
-Run the BAT and select source, existing output folder, restoration mode and an
-explicit check level before confirming:
+The restoration recipe is preserved: cut points, crops/scaling, HandBrake
+encoding settings, Avidemux section order, copy-mode assembly and processing tool
+versions remain unchanged. Existing codec/join compatibility limitations have
+not been resolved by this maintenance update.
 
-- **Basic (routine):** tool exit statuses and required nonempty outputs are checked.
-  The decoded-frame assembly comparison is **NOT RUN**. This cannot establish
-  pristine joins, complete picture identity, timestamps, HDR or synchronization.
-- **Exhaustive:** additionally decode the assembly and ordered sections and
-  compare every decoded frame's fingerprint, pixel format and geometry. This
-  can take many hours. It still does not qualify intended edits, timing, HDR,
-  source identity or universal player compatibility. During decoding, progress
-  messages appear and the console offers Q to stop while retaining evidence.
+Progress messages identify copying, encoding, joining and final packaging.
+Encoding can take a long time. FFmpeg ignores accidental keyboard commands.
+Avidemux questions appear directly in the console; read any warning before
+answering. Continuing past a codec warning does not resolve it.
 
-FFmpeg does not accept accidental keyboard commands during splitting. Avidemux
-runs visibly in the console so its codec-compatibility questions can be answered
-explicitly. A warning remains unresolved even if you choose to continue. Full
-Avidemux diagnostics appear in the console; processing.log records its stage
-marker, not a complete assembly transcript. Other processing diagnostics and
-validation reports remain in docs/temp; final mux logs are in final-remux.log.
+The program stops on reported processing errors or missing/empty expected files.
+If this happens, keep the completed sections and the `docs/temp` folder: do not
+restart and repeat encoding immediately. Diagnostic logs in that folder can help
+investigate the problem. These operational checks do not guarantee seamless
+joins or compatibility with every player.
 
-Tool failures or missing/empty outputs stop the job. The bundled Avidemux may
-return success after an incomplete save, so routine checks alone cannot prove
-assembly completeness. Check the selected level and assembly-check.txt; a NOT RUN
-record is never a PASS. Final completion still requests review and retains work.
+All intermediate videos and logs are retained, including after completion.
+Prepared video, raw/encoded sections, assembly and output may coexist, so allow
+substantially more disk space than the historical release requirement. Displayed
+free space is not a guarantee that a run will fit. Automatic resume and cleanup
+are not implemented. Before another run, move the retained `docs/temp` folder to
+a safe location; an existing workspace or destination output is never replaced.
 
-All intermediates remain, including after final output creation. Prepared video,
-raw/encoded sections, assembly and output may coexist; free-space figures are
-not a guarantee the job fits. There is no automatic resume or cleanup. A new run
-refuses an existing docs/temp or output. Keep completed encodes/logs after errors.
+Spaces, Unicode, ampersands, brackets and parentheses are supported in selected
+paths. Legacy batch paths containing `!`, `%`, `^`, embedded quotes or control
+characters are rejected with guidance. Source identity is not automatically
+verified; the required disc video track described above is still essential.
 
-Dialogs support cancel, manual path entry and quit. Spaces, Unicode, ampersands,
-brackets and parentheses are supported. Legacy batch paths containing !, %, ^,
-embedded quotes or control characters are rejected with guidance.
-Published 1.0.0 downloads remain unchanged. No source fingerprint registry or
-new encoding/join engine is introduced. Local source-only candidates require a
-separate complete trusted historical installation; they contain no tools/media.
+Published 1.0.0 downloads remain unchanged. No new encoding/join engine is
+introduced. Local source-only candidates contain no processing tools or media;
+they require a separate complete trusted installation.
