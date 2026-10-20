@@ -16,6 +16,18 @@ powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File "%~dp0docs\scripts\
 if errorlevel 1 exit /b 2
 call :prepare_workspace
 if errorlevel 1 exit /b 2
+if not exist "docs\scripts\Test-SourceFingerprint.ps1" (
+    echo Source-check helper is missing. Extract the complete updated program folder.
+    pause
+    exit /b 2
+)
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "docs\scripts\Test-SourceFingerprint.ps1" -Film BvS -Source "%file%" -WorkDirectory "docs\temp"
+set "fingerprint_result=%errorlevel%"
+if not "%fingerprint_result%"=="0" (
+    echo Source verification did not complete successfully. Processing has stopped.
+    pause
+    exit /b 2
+)
 setlocal EnableDelayedExpansion
 
 ::Making sure setup is confirmed before any processing starts.

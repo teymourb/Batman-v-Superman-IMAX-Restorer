@@ -27,6 +27,13 @@ Choose between 2 **constant-width** IMAX Restorations:
 
 <br>
 
+The unreleased maintenance version adds a mandatory video-track fingerprint check
+before restoration. It reads and temporarily extracts the compressed video; it
+does not decode or encode it. Unsupported sources or check failures stop the run.
+The check itself needs room for one extracted video track. See
+[the fingerprint recipe and limitations](docs/SOURCE-FINGERPRINT.md). Final Windows
+qualification is recorded in the source pull request; this is not a new published download.
+
 #### INSTRUCTIONS:  
 - Extract the complete application folder to a drive with room for the prepared video, raw and encoded segments, assembled video and final output. The unreleased maintenance version retains all of these; the historical free-space figure above is not its storage requirement.
 - Launch *Batman-v-Superman-IMAX-Restorer.bat* and disregard the unknown publisher prompt
@@ -143,8 +150,8 @@ a safe location; an existing workspace or destination output is never replaced.
 
 Spaces, Unicode, ampersands, brackets and parentheses are supported in selected
 paths. Legacy batch paths containing `!`, `%`, `^`, embedded quotes or control
-characters are rejected with guidance. Source identity is not automatically
-verified; the required disc video track described above is still essential.
+characters are rejected with guidance. The mandatory fingerprint check recognizes the supported video track;
+it does not qualify output timing, joins or HDR preservation.
 
 Published 1.0.0 downloads remain unchanged. No new encoding/join engine is
 introduced. Local source-only candidates contain no processing tools or media;
