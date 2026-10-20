@@ -85,6 +85,19 @@ class SelectionWindows(unittest.TestCase):
         self.assertNotIn('Exhaustive',result.stdout)
         self.assertIn('A file path is not a confirmation',result.stdout)
 
+    def test_dialog_readiness_enter_quit_and_retry(self):
+        # Exercise the real readiness function without opening native UI in CI.
+        prefix = HELPER.read_text().split('\ntry {\n    if ($ValidateEnvironment)', 1)[0]
+        harness = self.root / 'readiness.ps1'
+        for is_source in ('$true', '$false'):
+            harness.write_text(prefix + "\ntry { Wait-ForDialog " + is_source + "; Write-Host 'DIALOG_READY'; exit 0 } catch [OperationCanceledException] { Write-Host $_.Exception.Message; exit 3 }\n")
+            for answer, status in (('\n', 0), ('q\n', 3), ('not-ready\n\n', 0)):
+                result = subprocess.run(['powershell.exe', '-NoProfile', '-File', str(harness)],
+                                        input=answer, capture_output=True, text=True, timeout=30)
+                self.assertEqual(result.returncode, status, result.stdout + result.stderr)
+                self.assertEqual('DIALOG_READY' in result.stdout, status == 0)
+                self.assertEqual(list(self.dest.iterdir()), [])
+
     def test_selected_entry_valid_settings_are_silent(self):
         env=os.environ.copy()
         env.update(file=str(self.source),folder=str(self.dest),version='1',dialog='y',dialog2='y',RESTORER_SELECTION_READY='1')
