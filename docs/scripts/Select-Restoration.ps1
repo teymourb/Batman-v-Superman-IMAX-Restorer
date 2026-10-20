@@ -103,6 +103,7 @@ try {
             Write-Host 'Required source: an MKV rip of the Asteroid City Blu-ray disc.'
         }
         Write-Host 'Only the unaltered video track from this specific disc is supported.'
+        if ($Film -eq 'BvS') { Write-Host 'Source matching ignores added Dolby Vision RPU metadata; this restorer targets HDR10 output.' }
         Write-Host 'No other version will work. You may keep whichever audio and subtitle tracks you wish in your rip.'
         Write-Host 'Your original MKV is not modified. The restoration is saved as a separate file.'
         Write-Host 'No processing has started. At a text prompt, enter q or leave it blank to quit.'
@@ -162,6 +163,8 @@ try {
     } else {
         Write-Host 'Working files and final output use separate drive locations.'
     }
+    Write-Host 'Before restoration, the source check temporarily extracts the video track and then removes that extraction.'
+    Write-Host 'Allow free space approximately equal to the source MKV size plus 1 GiB for that check.'
     Write-Host 'Allow room for several large temporary video files as well as the final MKV.'
 
     Write-Host 'Temporary videos and logs are kept in the working folder after processing.'

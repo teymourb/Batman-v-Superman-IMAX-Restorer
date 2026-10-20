@@ -4,10 +4,16 @@ param(
     [Parameter(Mandatory=$true)][ValidateSet('BvS','Asteroid')][string]$Film,
     [Parameter(Mandatory=$true)][string]$Source,
     [Parameter(Mandatory=$true)][string]$WorkDirectory,
-    [string]$InstallationRoot = (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent)
+    [string]$InstallationRoot
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+if ([string]::IsNullOrWhiteSpace($InstallationRoot)) { $InstallationRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..')) }
+function Get-Sha256([string]$Path) {
+    $stream = [IO.File]::OpenRead($Path); $sha = [Security.Cryptography.SHA256]::Create()
+    try { return ([BitConverter]::ToString($sha.ComputeHash($stream))).Replace('-','').ToLowerInvariant() }
+    finally { $sha.Dispose(); $stream.Dispose() }
+}
 function Quote-Argument([string]$Value) {
     $quoted = '"'; $slashes = 0
     foreach ($character in $Value.ToCharArray()) {
@@ -106,7 +112,7 @@ try {
         $name = [IO.Path]::GetFileNameWithoutExtension($tool)
         $versionArg = if ($name -eq 'ffmpeg') { '-version' } else { '--version' }
         $versionLog = Invoke-CheckedTool $tool @($versionArg) ($name + '-version')
-        $record.tools[$name] = @{ version=([IO.File]::ReadAllLines($versionLog) | Select-Object -First 1); sha256=(Get-FileHash -LiteralPath $tool -Algorithm SHA256).Hash.ToLowerInvariant() }
+        $record.tools[$name] = @{ version=([IO.File]::ReadAllLines($versionLog) | Select-Object -First 1); sha256=(Get-Sha256 $tool) }
     }
     $identification = Invoke-CheckedTool $merge @('-J',$Source) 'identify'
     $info = [IO.File]::ReadAllText($identification) | ConvertFrom-Json
