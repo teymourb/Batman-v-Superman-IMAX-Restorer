@@ -6,7 +6,6 @@ param(
     [string]$Source,
     [string]$Destination,
     [string]$Mode,
-    [string]$ValidationMode = 'basic',
     [switch]$Manual,
     [switch]$ValidateOnly,
     [switch]$ValidateEnvironment
@@ -49,7 +48,6 @@ function Check-Selection {
     if ([IO.Path]::GetExtension($Source) -ine '.mkv' -or (Get-Item -LiteralPath $Source).Length -eq 0) { throw 'The source must be a nonempty MKV file.' }
     if (-not [IO.Directory]::Exists($Destination)) { throw 'The output folder does not exist. Create or select an existing folder.' }
     if ($Mode -notin @('1','2')) { throw 'Choose mode 1 or 2.' }
-    if ($ValidationMode -notin @('basic','exhaustive')) { throw 'Choose basic or exhaustive validation through normal setup.' }
     $name = if ($Film -eq 'BvS') {
         if ($Mode -eq '1') { 'Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.78.mkv' } else { 'Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.43 (unmasked).mkv' }
     } else {
@@ -93,12 +91,22 @@ function Select-Path([bool]$IsSource) {
 try {
     if ($ValidateEnvironment) {
         $Source = $env:file; $Destination = $env:folder; $Mode = $env:version
-        $ValidationMode = $env:RESTORER_VALIDATION_MODE
         if ($env:RESTORER_SELECTION_READY -ne '1' -or $env:dialog -ne 'y' -or $env:dialog2 -ne 'y') { throw 'Selection is missing. Start the launcher normally.' }
     } elseif (-not $ValidateOnly) {
-        Write-Host "=== $Film restoration setup ==="
-        Write-Host 'No processing has started. Type q or submit an empty text prompt to quit.'
-        Write-Host 'Use the required original disc video track. Source identity is not automatically verified.'
+        if ($Film -eq 'BvS') {
+            Write-Host '=== Batman v Superman: Dawn of Justice Ultimate Edition IMAX Restorer ==='
+            Write-Host 'Restore your preferred constant-width IMAX presentation with HDR10.'
+            Write-Host 'Required source: an MKV rip of the 4K Ultra HD Blu-ray (2021 Remaster).'
+        } else {
+            Write-Host '=== Asteroid City Theatrical Scope Restorer ==='
+            Write-Host 'Restore your preferred constant-height Scope theatrical presentation.'
+            Write-Host 'Required source: an MKV rip of the Asteroid City Blu-ray disc.'
+        }
+        Write-Host 'Only the unaltered video track from this specific disc is supported.'
+        Write-Host 'No other version will work. You may keep whichever audio and subtitle tracks you wish in your rip.'
+        Write-Host 'Your original MKV is not modified. The restoration is saved as a separate file.'
+        Write-Host 'No processing has started. At a text prompt, enter q or leave it blank to quit.'
+        Write-Host 'Step 1 of 3: select your source MKV in the file dialog.'
         while ($true) {
             try {
                 $Source = Get-PathValue (Select-Path $true)
@@ -106,6 +114,7 @@ try {
                 break
             } catch [OperationCanceledException] { throw } catch { Write-Host ('Source: ' + $_.Exception.Message) }
         }
+        Write-Host 'Step 2 of 3: select the folder where the restored MKV will be saved.'
         while ($true) {
             try {
                 $Destination = Get-PathValue (Select-Path $false)
@@ -114,13 +123,17 @@ try {
             } catch [OperationCanceledException] { throw } catch { Write-Host ('Destination: ' + $_.Exception.Message) }
         }
         if ($Film -eq 'BvS') {
-            Write-Host 'Required source: 4K Blu-ray Ultimate Edition remastered, unaltered video track.'
-            Write-Host '1: IMAX 1.78 - centre-crop the five IMAX sections.'
-            Write-Host '2: IMAX 1.43 unmasked - windowbox the scope sections.'
+            Write-Host 'Step 3 of 3: choose your constant-width IMAX restoration.'
+            Write-Host '1: IMAX 1.78:1 - IMAX scenes vertically centre-cropped and upscaled to fill 16:9.'
+            Write-Host '   Scope scenes remain unchanged. Best suited for 16:9 screens.'
+            Write-Host '2: IMAX 1.43:1 (unmasked) - Scope scenes downscaled and windowboxed in a 16:9 container.'
+            Write-Host '   IMAX scenes remain unchanged. Preserves the full height of the IMAX image.'
         } else {
-            Write-Host 'Required source: Asteroid City Blu-ray, unaltered video track. This is not a 4K/UHD source.'
-            Write-Host '1: Scope unmasked - windowbox the Academy ratio scenes.'
-            Write-Host '2: Scope masked - pillarbox the Academy ratio scenes.'
+            Write-Host 'Step 3 of 3: choose your constant-height Scope theatrical restoration.'
+            Write-Host '1: Scope Theatrical (unmasked) - Black and White scenes downscaled and windowboxed.'
+            Write-Host '   Keeps the 16:9 container; Blu-ray compliant.'
+            Write-Host '2: Scope Theatrical (masked) - Black and White scenes downscaled and pillarboxed.'
+            Write-Host '   Uses a 2.39:1 container with the top and bottom black bars removed.'
         }
         while ($true) {
             $Mode = Read-Answer 'Choose 1 or 2'
@@ -128,31 +141,17 @@ try {
             Write-Host 'Enter 1 or 2; your source and destination selections are retained.'
         }
     }
-    if (-not $ValidateOnly -and -not $ValidateEnvironment) {
-        Write-Host 'Choose the checks to run after assembly:'
-        Write-Host '1: Basic - tool exit codes, required inputs and nonempty outputs only.'
-        Write-Host '   Does not verify frame identity/order, joins, timing, HDR or playback.'
-        Write-Host '2: Exhaustive - also decode the assembly and all sections and compare every frame.'
-        Write-Host '   Can add many hours. Does not verify intended edits, timing, HDR or player compatibility.'
-        while ($true) {
-            $validationChoice = Read-Answer 'Checks: enter 1 or 2 (q to quit)'
-            if ($validationChoice -eq '1') { $ValidationMode = 'basic'; break }
-            if ($validationChoice -eq '2') { $ValidationMode = 'exhaustive'; break }
-            Write-Host 'Enter 1 or 2; no check mode was selected.'
-        }
-    }
     Check-Selection
-    if ($ValidateOnly -or $ValidateEnvironment) { Write-Host 'Selection validation passed. No media tool started.'; exit 0 }
+    if ($ValidateOnly -or $ValidateEnvironment) { exit 0 }
+    Write-Host 'Review your restoration before starting:'
     Write-Host "Source: $Source"
     Write-Host "Output: $ExpectedOutput"
     $modeName = if ($Film -eq 'BvS') {
-        if ($Mode -eq '1') { 'IMAX 1.78 - IMAX sections centre-cropped' } else { 'IMAX 1.43 unmasked - scope sections windowboxed' }
+        if ($Mode -eq '1') { 'IMAX 1.78:1 (constant-width; IMAX scenes vertically centre-cropped)' } else { 'IMAX 1.43:1 (constant-width; unmasked 16:9 container)' }
     } else {
-        if ($Mode -eq '1') { 'Scope unmasked - Academy scenes windowboxed' } else { 'Scope masked - Academy scenes pillarboxed' }
+        if ($Mode -eq '1') { 'Scope Theatrical (constant-height; unmasked 16:9 container)' } else { 'Scope Theatrical (constant-height; masked 2.39:1 container)' }
     }
-    Write-Host "Mode: $Mode - $modeName"
-    Write-Host "Checks: $ValidationMode"
-    if ($ValidationMode -eq 'basic') { Write-Host 'Exhaustive assembly validation will NOT RUN. Completion is not an assembly-validation pass.' }
+    Write-Host "Restoration: $modeName"
     Write-Host "Working files: $(Join-Path $root 'docs\temp')"
     $sourceBytes = (Get-Item -LiteralPath $Source).Length
     Write-Host ('Source size: {0:N2} GiB ({1} bytes).' -f ($sourceBytes / 1GB), $sourceBytes)
@@ -163,10 +162,10 @@ try {
     } else {
         Write-Host 'Working files and final output use separate drive locations.'
     }
-    Write-Host 'Peak space for this keep-all workflow is not measured. These figures are not a guarantee that the run will fit.'
+    Write-Host 'Allow room for several large temporary video files as well as the final MKV.'
 
-    Write-Host 'All intermediate videos and logs are retained. Several film-sized files may coexist.'
-    Write-Host 'Encoding can take hours. Exhaustive checking, if selected, adds decoding time. Do not restart after a failure.'
+    Write-Host 'Temporary videos and logs are kept in the working folder after processing.'
+    Write-Host 'Processing can take several hours. Keep this window open and your PC awake.'
     while ($true) {
         $answer = Read-Answer 'Start processing? Enter y to start, or n/q to quit'
         if ($answer -eq 'n') { throw [OperationCanceledException]::new('Cancelled. No processing started.') }
@@ -183,7 +182,6 @@ try {
     $start.EnvironmentVariables['file'] = $Source
     $start.EnvironmentVariables['folder'] = $Destination
     $start.EnvironmentVariables['version'] = $Mode
-    $start.EnvironmentVariables['RESTORER_VALIDATION_MODE'] = $ValidationMode
     $start.EnvironmentVariables['dialog'] = 'y'
     $start.EnvironmentVariables['dialog2'] = 'y'
     $start.EnvironmentVariables['RESTORER_SELECTION_READY'] = '1'

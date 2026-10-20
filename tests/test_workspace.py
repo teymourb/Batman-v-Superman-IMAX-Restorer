@@ -15,8 +15,7 @@ STARTUP = STARTUP.replace('if errorlevel 1 exit /b 2', 'call :prepare_workspace\
 # This harness isolates workspace handling, which supports ! in installation paths.
 # Interactive setup's stricter path validation and processing expansion are separate.
 STARTUP = STARTUP.replace('setlocal EnableDelayedExpansion\n', '')
-SUCCESS = TEXT.split('::Remove only the known log;', 1)[1].split(
-    ':: Workspace helpers:', 1)[0]
+SUCCESS = TEXT[TEXT.index('echo Restoration complete.'):].split(':: Workspace helpers:', 1)[0]
 HELPERS = TEXT.split(':: Workspace helpers:', 1)[1].split('\n:remux_warning', 1)[0]
 HANDLERS = ':remux_warning' + TEXT.split('\n:remux_warning', 1)[1]
 
@@ -24,12 +23,13 @@ HANDLERS = ':remux_warning' + TEXT.split('\n:remux_warning', 1)[1]
 class WorkspaceSource(unittest.TestCase):
     def test_startup_and_cleanup_are_connected_to_tested_helpers(self):
         self.assertIn('call :prepare_workspace\nif errorlevel 1 exit /b 2', STARTUP)
-        self.assertIn('call :cleanup_workspace\nif errorlevel 1 goto cleanup_incomplete', SUCCESS)
+        self.assertIn('exit /b 0', SUCCESS)
+        self.assertNotIn('cleanup_workspace', TEXT)
         self.assertNotRegex(TEXT, r'(?im)^\s*del\s+\*')
         self.assertNotRegex(TEXT, r'(?im)^\s*rmdir\s+/(s|q)')
         self.assertIn('if exist "docs\\temp" (', HELPERS)
         self.assertIn('mkdir "docs\\temp"\nif errorlevel 1 (', HELPERS)
-        self.assertIn('rmdir "docs\\temp" 2>nul', HELPERS)
+        self.assertNotIn('rmdir ', HELPERS)
 
 
 @unittest.skipUnless(os.name == 'nt', 'requires actual Windows cmd.exe')
@@ -102,7 +102,7 @@ exit /b %restorer_result%
             result = self.run_case(install, caller)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('PROCESSING_STARTED', result.stdout)
-            self.assertFalse((install / 'docs/temp').exists())
+            self.assertTrue((install / 'docs/temp').exists())
 
     def test_existing_recovery_work_survives_repeated_launches(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -137,7 +137,7 @@ exit /b %restorer_result%
                         self.assertFalse((install / 'docs').exists())
 
     def test_warning_error_and_unknown_leftovers_are_retained(self):
-        for outcome, code in (('warning', 1), ('error', 2), ('leftovers', 1)):
+        for outcome, code in (('warning', 1), ('error', 2), ('leftovers', 0)):
             with self.subTest(outcome=outcome):
                 with tempfile.TemporaryDirectory() as folder:
                     install, caller = self.make_case(Path(folder))
@@ -171,7 +171,7 @@ exit /b %restorer_result%
                 self.assertNotIn('PROCESSING_STARTED', second.stdout)
                 out, err = proc.communicate('\n', timeout=30)
                 self.assertEqual(proc.returncode, 0, out + err)
-                self.assertFalse((install / 'docs/temp').exists())
+                self.assertTrue((install / 'docs/temp').exists())
             finally:
                 if proc.poll() is None:
                     proc.kill()

@@ -52,7 +52,7 @@ class RealAssembly(unittest.TestCase):
         work = root / label
         result = self.command([
             'powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File',
-            ROOT / 'docs/scripts/Validate-Assembly.ps1', '-FFmpegPath', FFMPEG,
+            ROOT / 'tools/qualification/Validate-Assembly.ps1', '-FFmpegPath', FFMPEG,
             '-AssemblyPath', assembly, '-InputListPath', inputs,
             '-WorkDirectory', work])
         return result, work

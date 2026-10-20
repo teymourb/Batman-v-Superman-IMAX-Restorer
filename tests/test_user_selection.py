@@ -19,6 +19,9 @@ class SelectionSource(unittest.TestCase):
         self.assertIn("$start.EnvironmentVariables['file'] = $Source",helper)
         self.assertIn('exit $process.ExitCode',helper)
         self.assertNotIn('mshta',text.lower())
+        for term in ('ValidationMode', 'RESTORER_VALIDATION_MODE', 'Exhaustive', 'Basic', 'Selection validation passed'):
+            self.assertNotIn(term, helper)
+        self.assertLess(helper.index('Only the unaltered video track'), helper.index('Select-Path $true'))
 @unittest.skipUnless(os.name=='nt','requires native Windows PowerShell 5.1')
 class SelectionWindows(unittest.TestCase):
     def setUp(self):
@@ -55,9 +58,9 @@ class SelectionWindows(unittest.TestCase):
     def test_helper_launches_child_with_unicode_environment_and_returns_status(self):
         self.source.rename(self.root/'caf\u00e9 (video) & source.mkv'); self.source=self.root/'caf\u00e9 (video) & source.mkv'
         child=self.root/'child (launcher) & test.bat'
-        child.write_text('@echo off\nsetlocal DisableDelayedExpansion\npowershell.exe -NoProfile -Command "[IO.File]::WriteAllText($env:SELECTION_TRACE, $env:file + [Environment]::NewLine + $env:folder + [Environment]::NewLine + $env:version + [Environment]::NewLine + $env:dialog + [Environment]::NewLine + $env:RESTORER_VALIDATION_MODE)"\nexit /b 7\n')
+        child.write_text('@echo off\nsetlocal DisableDelayedExpansion\npowershell.exe -NoProfile -Command "[IO.File]::WriteAllText($env:SELECTION_TRACE, $env:file + [Environment]::NewLine + $env:folder + [Environment]::NewLine + $env:version + [Environment]::NewLine + $env:dialog)"\nexit /b 7\n')
         trace=self.root/'trace.txt'; env=os.environ.copy(); env['SELECTION_TRACE']=str(trace)
-        result=subprocess.run(['powershell.exe','-NoProfile','-STA','-ExecutionPolicy','Bypass','-File',str(HELPER),'-Film','BvS','-Manual','-Launcher',str(child)],input=f'{self.source}\n{self.dest}\n1\n2\nwrong-answer\ny\n',capture_output=True,text=True,encoding='utf-8',timeout=30,env=env)
+        result=subprocess.run(['powershell.exe','-NoProfile','-STA','-ExecutionPolicy','Bypass','-File',str(HELPER),'-Film','BvS','-Manual','-Launcher',str(child)],input=f'{self.source}\n{self.dest}\n1\nwrong-answer\ny\n',capture_output=True,text=True,encoding='utf-8',timeout=30,env=env)
         self.assertEqual(result.returncode,7,result.stdout+result.stderr)
         recorded = trace.read_text(encoding='utf-8').splitlines()
         # PowerShell's GetFullPath may expand the runner's 8.3 TEMP directory.
@@ -65,36 +68,34 @@ class SelectionWindows(unittest.TestCase):
         self.assertTrue(Path(recorded[1]).samefile(self.dest))
         self.assertEqual(Path(recorded[0]).name, self.source.name)
         self.assertEqual(Path(recorded[1]).name, self.dest.name)
-        self.assertEqual(recorded[2:], ['1', 'y', 'exhaustive'])
+        self.assertEqual(recorded[2:], ['1', 'y'])
         self.assertIn('A file path is not a confirmation',result.stdout)
-    def test_basic_choice_retry_and_cancel_before_launch(self):
-        child=self.root/'child.bat'; child.write_text('@echo off\npowershell.exe -NoProfile -Command "[IO.File]::WriteAllText($env:SELECTION_TRACE,$env:RESTORER_VALIDATION_MODE)"\nexit /b 0\n')
+    def test_confirmation_retry_and_cancel_before_launch(self):
+        child=self.root/'child.bat'; child.write_text('@echo off\npowershell.exe -NoProfile -Command "[IO.File]::WriteAllText($env:SELECTION_TRACE,\'started\')"\nexit /b 0\n')
         trace=self.root/'trace.txt';env=os.environ.copy();env['SELECTION_TRACE']=str(trace)
         cmd=['powershell.exe','-NoProfile','-STA','-ExecutionPolicy','Bypass','-File',str(HELPER),'-Film','BvS','-Manual','-Launcher',str(child)]
         prefix=f'{self.source}\n{self.dest}\n1\n'
-        for ending in ('q\n','\n'):
+        for ending in ('q\n','\n','n\n'):
             result=subprocess.run(cmd,input=prefix+ending,env=env,capture_output=True,text=True,encoding='utf-8',timeout=30)
             self.assertEqual(result.returncode,3,result.stdout+result.stderr)
             self.assertFalse(trace.exists())
-        result=subprocess.run(cmd,input=prefix+'invalid\n1\ny\n',env=env,capture_output=True,text=True,encoding='utf-8',timeout=30)
+        result=subprocess.run(cmd,input=prefix+'invalid\ny\n',env=env,capture_output=True,text=True,encoding='utf-8',timeout=30)
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)
-        self.assertEqual(trace.read_text(),'basic')
-        self.assertIn('Exhaustive assembly validation will NOT RUN',result.stdout)
-        self.assertIn('no check mode was selected',result.stdout)
+        self.assertEqual(trace.read_text(),'started')
+        self.assertNotIn('Exhaustive',result.stdout)
+        self.assertIn('A file path is not a confirmation',result.stdout)
 
-    def test_validation_mode_must_be_explicit_and_known(self):
-        self.assertEqual(self.run_selection(extra=('-ValidationMode','unknown')).returncode,2)
+    def test_selected_entry_valid_settings_are_silent(self):
         env=os.environ.copy()
         env.update(file=str(self.source),folder=str(self.dest),version='1',dialog='y',dialog2='y',RESTORER_SELECTION_READY='1')
         cmd=['powershell.exe','-NoProfile','-STA','-ExecutionPolicy','Bypass','-File',str(HELPER),'-Film','BvS','-ValidateEnvironment']
-        for mode in ('', 'unknown', 'basic', 'exhaustive'):
-            env['RESTORER_VALIDATION_MODE']=mode
-            result=subprocess.run(cmd,env=env,capture_output=True,text=True,encoding='utf-8',timeout=30)
-            self.assertEqual(result.returncode,0 if mode in ('basic','exhaustive') else 2,result.stdout+result.stderr)
+        result=subprocess.run(cmd,env=env,capture_output=True,text=True,encoding='utf-8',timeout=30)
+        self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+        self.assertEqual(result.stdout,'')
 
     def test_selected_entry_without_valid_settings_stops(self):
         env=os.environ.copy()
-        for key in ('file','folder','version','dialog','dialog2','RESTORER_SELECTION_READY','RESTORER_VALIDATION_MODE'): env.pop(key,None)
+        for key in ('file','folder','version','dialog','dialog2','RESTORER_SELECTION_READY'): env.pop(key,None)
         result=subprocess.run(['powershell.exe','-NoProfile','-STA','-ExecutionPolicy','Bypass','-File',str(HELPER),'-Film','BvS','-ValidateEnvironment'],env=env,capture_output=True,text=True,encoding='utf-8',timeout=30)
         self.assertEqual(result.returncode,2,result.stdout+result.stderr)
 
@@ -120,7 +121,6 @@ class WindowsSelection(unittest.TestCase):
         launcher = install / 'Batman-v-Superman-IMAX-Restorer.bat'
         # Only remove attended terminal pauses; all setup and processing code stays real.
         launcher.write_bytes(re.sub(r'(?im)^\s*PAUSE\s*$', 'rem unattended terminal pause', TEXT).replace('\n', '\r\n').encode())
-        (scripts / 'Validate-Assembly.ps1').write_text('exit 0\n')
         for tool in ('mkvtoolnix/mkvmerge', 'ffmpeg/ffmpeg', 'handbrake/HandBrakeCLI', 'avidemux/avidemux_cli'):
             target = install / 'docs/programs' / (tool + '.exe')
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -147,42 +147,26 @@ class WindowsSelection(unittest.TestCase):
         for mode in ('1', '2'):
             with self.subTest(mode=mode), tempfile.TemporaryDirectory() as td:
                 install, launcher, source, destination = self.make_case(Path(td))
-                answers = '"' + str(source) + '"\n"' + str(destination) + '"\n' + mode + '\n2\ny\n'
+                answers = '"' + str(source) + '"\n"' + str(destination) + '"\n' + mode + '\ny\n'
                 result = self.invoke(install, launcher, source, destination, mode, answers)
-                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertIn('Restoration complete.', result.stdout)
                 name = 'Batman v Superman Dawn of Justice Ultimate Edition IMAX ' + ('1.78.mkv' if mode == '1' else '1.43 (unmasked).mkv')
                 self.assertTrue((destination / name).is_file(), result.stdout + result.stderr)
                 self.assertEqual(source.read_bytes(), b'synthetic original')
-                self.assertIn('PASS:', (install / 'docs/temp/assembly-check.txt').read_text())
+                self.assertFalse((install / 'docs/temp/assembly-check.txt').exists())
                 self.assertIn('Source size:', result.stdout)
                 self.assertIn('Available space (working drive):', result.stdout)
                 self.assertIn('Available space (destination drive):', result.stdout)
                 self.assertIn('share the same free-space pool', result.stdout)
                 self.assertTrue((install / 'docs/temp/processing.log').exists())
 
-    def test_basic_pipeline_both_modes_records_not_run_without_validator(self):
-        for mode in ('1','2'):
-            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as td:
-                install,launcher,source,destination=self.make_case(Path(td))
-                validator=install/'docs/scripts/Validate-Assembly.ps1'
-                marker=install/'validator-called.txt'
-                validator.write_text("[IO.File]::WriteAllText((Join-Path $PSScriptRoot '../../validator-called.txt'),'called'); exit 2\n")
-                answers=f'{source}\n{destination}\n{mode}\n1\ny\n'
-                result=self.invoke(install,launcher,source,destination,mode,answers)
-                self.assertEqual(result.returncode,1,result.stdout+result.stderr)
-                self.assertFalse(marker.exists(),result.stdout+result.stderr)
-                self.assertIn('NOT RUN', (install/'docs/temp/assembly-check.txt').read_text())
-                self.assertIn('NOT RUN', (install/'docs/temp/processing.log').read_text())
-                self.assertNotIn('independent assembly validation passed',result.stdout)
-                self.assertEqual(source.read_bytes(),b'synthetic original')
-                self.assertTrue(list(destination.glob('*.mkv')),result.stdout+result.stderr)
-
     def test_quit_and_invalid_confirmation_do_not_create_workspace(self):
         for answers in ('q\n', '', None):
             with tempfile.TemporaryDirectory() as td:
                 install, launcher, source, destination = self.make_case(Path(td))
                 if answers is None:
-                    answers = str(source) + '\n' + str(destination) + '\n1\n1\n' + str(source) + '\nn\n'
+                    answers = str(source) + '\n' + str(destination) + '\n1\n' + str(source) + '\nn\n'
                 result = self.invoke(install, launcher, source, destination, answers=answers)
                 self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
                 self.assertFalse((install / 'docs/temp').exists())

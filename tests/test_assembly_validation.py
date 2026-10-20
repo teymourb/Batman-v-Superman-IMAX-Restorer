@@ -8,7 +8,7 @@ import time
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-VALIDATOR = ROOT / 'docs' / 'scripts' / 'Validate-Assembly.ps1'
+VALIDATOR = ROOT / 'tools' / 'qualification' / 'Validate-Assembly.ps1'
 FFMPEG = os.environ.get('RESTORER_ASSEMBLY_FFMPEG') or shutil.which('ffmpeg')
 
 

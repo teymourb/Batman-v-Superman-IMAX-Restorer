@@ -2,20 +2,18 @@
 
 ## Unreleased — proposed 1.0.1
 
-- Require an explicit Basic/Exhaustive check choice before processing. Basic
-  retains tool/input/output guards and records decoded comparison NOT RUN.
-  Exhaustive compares ordered decoded frames and can take many hours; failed,
-  cancelled or unavailable validation stops processing without a PASS.
+- Rewrite setup, processing and completion messages using the original source
+  requirements and restoration descriptions; remove developer qualification
+  choices and frame-comparison reports from the released workflow.
+- Keep frame comparison, fixtures and qualification helpers in developer tools,
+  separate from the application and its public package.
 - Disable accidental FFmpeg keyboard input and show Avidemux questions and
-  diagnostics directly in the console. Do not automatically accept warnings.
-  Exhaustive comparison shows elapsed progress and supports Q cancellation.
-- Stop failed preparation/splitting/encoding/assembly immediately, record stage
-  diagnostics and reject missing/empty expected outputs before dependent work.
-- Catch negative native-process crash statuses as well as positive failures.
-- Preserve all intermediate files and logs even when final remux succeeds:
-  Avidemux does not reliably propagate append/save errors. Output creation now
-  returns warning status 1 pending full restoration qualification. More free disk
-  space is required; automatic cleanup remains disabled pending qualification.
+  diagnostics directly in the console. Warnings are not automatically accepted.
+- Stop failed preparation/splitting/encoding/assembly, record stage diagnostics
+  and reject missing/empty outputs before dependent work. Catch native crashes.
+- Preserve intermediates and logs after completion or failure. Retention alone
+  does not turn successful completion into a warning; actual tool warnings and
+  errors remain separate. Allow additional disk space for retained files.
 
 - Anchor execution to the launcher folder and refuse an existing temporary
   workspace instead of deleting retained work on restart.
@@ -28,5 +26,4 @@
 - Add focused Windows regressions and synthetic remux checks for both modes.
 - Preserve existing cuts, transforms, encoding settings and remux arguments.
 
-No new downloadable release has been published. Read docs/DEVELOPMENT.md for
-validation coverage and known limitations.
+No new downloadable release has been published. Read README.md for usage and known limitations.

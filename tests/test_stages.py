@@ -16,9 +16,10 @@ class StageSource(unittest.TestCase):
         for mode in ('1.78','1.43'):
             command=next(x for x in TEXT.splitlines() if 'avidemux_cli --load' in x and '--save "docs\\temp\\BvS_'+mode+'.mkv"' in x)
             expected=re.findall(r'--(?:load|append) "([^"]+)"',command)
-            self.assertEqual((ROOT/'docs/scripts'/('assembly-inputs-'+mode+'.txt')).read_text().splitlines(),expected)
-            anchor='call :require_stage_output "docs\\temp\\BvS_'+mode+'.mkv"\n\tif errorlevel 1 goto stage_failed\n\tcall :validate_assembly "'+mode+'"'
-            self.assertIn(anchor,TEXT)
+            self.assertEqual((ROOT/'tools/qualification'/('assembly-inputs-'+mode+'.txt')).read_text().splitlines(),expected)
+        for token in ('validate_assembly', 'RESTORER_VALIDATION_MODE', 'assembly-check.txt', 'Validate-Assembly.ps1'):
+            self.assertNotIn(token, TEXT)
+        self.assertIn('Restoration complete.', TEXT)
 
     def test_noninteractive_ffmpeg_and_visible_assembly(self):
         for line in TEXT.splitlines():
@@ -35,7 +36,7 @@ class StageSource(unittest.TestCase):
             self.assertIn('goto stage_', first)
             self.assertTrue('goto stage_warning' in second or 'if not errorlevel 0' in second)
         self.assertNotRegex(PIPELINE, r'(?im)^\s*del "docs\\temp\\BvS')
-        self.assertIn('if exist "docs\\temp\\processing.log" (', TEXT)
+        self.assertNotIn(':cleanup_workspace', TEXT)
 
 @unittest.skipUnless(os.name == 'nt', 'requires actual Windows cmd.exe')
 class WindowsStages(unittest.TestCase):
@@ -74,7 +75,7 @@ class WindowsStages(unittest.TestCase):
     def test_every_stage_stops_cascades_and_retains_work(self):
         for mode in (1,2):
             success,trace,files=self.run_mode(mode)
-            self.assertEqual(success.returncode,1,success.stdout+success.stderr)
+            self.assertEqual(success.returncode,0,success.stdout+success.stderr)
             self.assertIn('processing.log',files)
             self.assertIn('BvS.mkv',files)
             self.assertEqual(len(trace),18)
@@ -99,7 +100,7 @@ class WindowsStages(unittest.TestCase):
 
     def test_assembly_question_is_visible_and_requires_explicit_answer(self):
         result, trace, files = self.run_mode(1, assembly_question=True)
-        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn('SYNTHETIC CODEC QUESTION', result.stderr)
         self.assertIn('SYNTHETIC ANSWER: y', result.stdout)
         self.assertNotIn(b'SYNTHETIC CODEC QUESTION', files['processing.log'])
@@ -109,7 +110,7 @@ class WindowsStages(unittest.TestCase):
             for code in (0,1,2):
                 with self.subTest(mode=mode,code=code):
                     result,trace,files=self.run_mode(mode,1,code,dialog='n')
-                    self.assertEqual(result.returncode,1 if code in (0,1) else 2,result.stdout+result.stderr)
+                    self.assertEqual(result.returncode,0 if code==0 else 1 if code==1 else 2,result.stdout+result.stderr)
                     self.assertEqual(len(trace),18 if code==0 else 1)
                     self.assertIn('BvS.mkv',files)
 
@@ -119,13 +120,9 @@ class WindowsStages(unittest.TestCase):
         self.assertEqual(len(trace),1)
         self.assertIn('BvS.mkv',files)
 
-    def test_assembly_validator_failure_blocks_remux(self):
-        for mode in (1,2):
-            for code,missing in ((2,False),(-1,False),(0,True)):
-                with self.subTest(mode=mode,code=code,missing=missing):
-                    result,trace,files=self.run_mode(mode,validator_code=code,missing_validator=missing)
-                    self.assertEqual(result.returncode,2,result.stdout+result.stderr)
-                    self.assertEqual(len(trace),17)
-                    self.assertIn('processing.log',files)
-                    self.assertIn('BvS.mkv',files)
-                    self.assertIn('BvS_'+('1.78' if mode==1 else '1.43')+'.mkv',files)
+    def test_public_pipeline_does_not_require_developer_validator(self):
+        for mode in (1, 2):
+            result, trace, files = self.run_mode(mode, validator_code=2, missing_validator=True)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertEqual(len(trace), 18)
+            self.assertNotIn('assembly-check.txt', files)
