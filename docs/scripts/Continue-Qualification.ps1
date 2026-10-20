@@ -39,7 +39,7 @@ try {
     if ($destinationItem.FullName -eq $temp.FullName -or $destinationItem.FullName.StartsWith($temp.FullName + '\',[StringComparison]::OrdinalIgnoreCase)) { throw 'Destination must be outside the retained workspace.' }
     $stateItem = Safe-Item (Join-Path $temp.FullName 'storage-qualification.json') $true
     $stateSnapshot = Snapshot $stateItem
-    $state = Get-Content -LiteralPath $stateItem.FullName -Raw | ConvertFrom-Json
+    $state = Get-Content -LiteralPath $stateItem.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
     if ($state.Phase -cne 'BeforeAssembly' -or [long]$state.VideoBytes -le 0) { throw 'Expected the completed BeforeAssembly storage checkpoint.' }
     $source = Safe-Item ([string]$state.Source) $true
     if ($source.Length -ne [long]$state.Length -or $source.LastWriteTimeUtc.Ticks -ne [long]$state.Ticks) { throw 'Original source metadata differs from the storage record.' }
