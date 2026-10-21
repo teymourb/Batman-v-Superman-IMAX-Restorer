@@ -12,6 +12,7 @@ if not exist "%~dp0docs\scripts\Select-Restoration.ps1" (
 powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File "%~dp0docs\scripts\Select-Restoration.ps1" -Film BvS -Launcher "%~f0"
 set "selection_result=%errorlevel%"
 if "%selection_result%"=="2" pause
+if "%selection_result%"=="0" pause
 exit /b %selection_result%
 
 :selected_entry
@@ -27,7 +28,7 @@ if not exist "docs\scripts\Test-SourceFingerprint.ps1" (
     pause
     exit /b 2
 )
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "docs\scripts\Test-SourceFingerprint.ps1" -Film BvS -Source "%file%" -WorkDirectory "docs\temp"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "docs\scripts\Test-SourceFingerprint.ps1" -Film BvS -Source "%file%" -WorkDirectory "%RESTORER_LOG_DIRECTORY%" -ScratchDirectory "docs\temp"
 set "fingerprint_result=%errorlevel%"
 if not "%fingerprint_result%"=="0" (
     echo.
@@ -43,9 +44,9 @@ setlocal EnableDelayedExpansion
 echo.
 echo ----------------------------------------------------------------
 echo Processing started. Keep this window open and the PC awake.
-echo Detailed tool progress: docs\temp\processing.log
+echo Detailed tool progress: "%RESTORER_LOG_DIRECTORY%\processing.log"
 echo Copying and encoding can take a long time. Detailed progress is saved in the log.
-echo Do not restart after a failure; retain the workspace for review.
+
 
 ::Check what version to use and make sure the user selected the right one
 if %version%==1 (
@@ -56,8 +57,8 @@ if %version%==1 (
 		echo.
 		echo ----------------------------------------------------------------
 		echo [%TIME%] Preparing the video-only working copy...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-		docs\programs\mkvtoolnix\mkvmerge -o "docs\temp\BvS.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "%file%" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+		docs\programs\mkvtoolnix\mkvmerge -o "docs\temp\BvS.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "%file%" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 		if errorlevel 2 goto stage_failed
 		if errorlevel 1 goto stage_warning
 		if not errorlevel 0 goto stage_failed
@@ -68,8 +69,8 @@ if %version%==1 (
 		echo.
 		echo ----------------------------------------------------------------
 		echo [%TIME%] Preparing the video-only working copy...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-		docs\programs\mkvtoolnix\mkvmerge -o "docs\temp\BvS.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags !file! >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+		docs\programs\mkvtoolnix\mkvmerge -o "docs\temp\BvS.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags !file! >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 		if errorlevel 2 goto stage_failed
 		if errorlevel 1 goto stage_warning
 		if not errorlevel 0 goto stage_failed
@@ -82,8 +83,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Copying a video section without encoding...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 00:05:09.142 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 85890 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_2s.mkv" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 00:05:09.142 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 85890 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_2s.mkv" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_2s.mkv"
@@ -92,8 +93,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Copying a video section without encoding...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 01:09:18.715 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 77191 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_4s.mkv" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 01:09:18.715 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 77191 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_4s.mkv" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_4s.mkv"
@@ -102,8 +103,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Copying a video section without encoding...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:10:22.606 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 44494 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_6s.mkv" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:10:22.606 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 44494 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_6s.mkv" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_6s.mkv"
@@ -112,8 +113,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Copying a video section without encoding...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:50:35.850 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 4163 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_8s.mkv" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:50:35.850 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 4163 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_8s.mkv" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_8s.mkv"
@@ -122,8 +123,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Copying a video section without encoding...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:54:43.862 -noaccurate_seek -i "docs\temp\BvS.mkv" -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_10s.mkv" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:54:43.862 -noaccurate_seek -i "docs\temp\BvS.mkv" -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_10s.mkv" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_10s.mkv"
@@ -136,8 +137,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Copying a video section without encoding...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 7388 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_1i.mkv" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 7388 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_1i.mkv" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_1i.mkv"
@@ -146,8 +147,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Encoding a section - this can take a long time...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_1i.mkv" -o "docs\temp\BvS_1i_Cropped.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 50800 -2 --cfr -w 3840 -l 2160 --crop 214:214:380:380 >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_1i.mkv" -o "docs\temp\BvS_1i_Cropped.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 50800 -2 --cfr -w 3840 -l 2160 --crop 214:214:380:380 >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_1i_Cropped.mkv"
@@ -156,8 +157,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Copying a video section without encoding...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 01:04:51.470 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 6427 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_3i.mkv" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 01:04:51.470 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 6427 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_3i.mkv" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_3i.mkv"
@@ -166,8 +167,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Encoding a section - this can take a long time...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_3i.mkv" -o "docs\temp\BvS_3i_Cropped.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 39400 -2 --cfr -w 3840 -l 2160 --crop 214:214:380:380 >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_3i.mkv" -o "docs\temp\BvS_3i_Cropped.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 39400 -2 --cfr -w 3840 -l 2160 --crop 214:214:380:380 >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_3i_Cropped.mkv"
@@ -176,8 +177,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Copying a video section without encoding...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:02:58.190 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 10633 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_5i.mkv" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:02:58.190 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 10633 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_5i.mkv" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_5i.mkv"
@@ -186,8 +187,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Encoding a section - this can take a long time...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_5i.mkv" -o "docs\temp\BvS_5i_Cropped.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 53000 -2 --cfr -w 3840 -l 2160 --crop 214:214:380:380 >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_5i.mkv" -o "docs\temp\BvS_5i_Cropped.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 53000 -2 --cfr -w 3840 -l 2160 --crop 214:214:380:380 >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_5i_Cropped.mkv"
@@ -196,8 +197,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Copying a video section without encoding...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:41:18.377 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 13366 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_7i.mkv" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:41:18.377 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 13366 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_7i.mkv" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_7i.mkv"
@@ -206,8 +207,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Encoding a section - this can take a long time...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_7i.mkv" -o "docs\temp\BvS_7i_Cropped.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 50000 -2 --cfr -w 3840 -l 2160 --crop 214:214:380:380 >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_7i.mkv" -o "docs\temp\BvS_7i_Cropped.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 50000 -2 --cfr -w 3840 -l 2160 --crop 214:214:380:380 >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_7i_Cropped.mkv"
@@ -216,8 +217,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Copying a video section without encoding...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:53:29.482 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 1804 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -map_metadata -1 -y "docs\temp\BvS_9i.mkv" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:53:29.482 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 1804 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -map_metadata -1 -y "docs\temp\BvS_9i.mkv" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_9i.mkv"
@@ -226,8 +227,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Encoding a section - this can take a long time...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_9i.mkv" -o "docs\temp\BvS_9i_Cropped.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 50000 -2 --cfr -w 3840 -l 2160 --crop 214:214:380:380 >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_9i.mkv" -o "docs\temp\BvS_9i_Cropped.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 50000 -2 --cfr -w 3840 -l 2160 --crop 214:214:380:380 >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_9i_Cropped.mkv"
@@ -267,7 +268,7 @@ if %version%==1 (
 	echo Assembly diagnostics and any questions appear in this window, not processing.log.
 	echo Answer only an explicit assembly question: y continues despite its warning; n declines.
 	echo Continuing does not establish codec compatibility or seamless joins.
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
 	docs\programs\avidemux\avidemux_cli --load "docs\temp\BvS_1i_Cropped.mkv" --append "docs\temp\BvS_2s.mkv" --append "docs\temp\BvS_3i_Cropped.mkv" --append "docs\temp\BvS_4s.mkv" --append "docs\temp\BvS_5i_Cropped.mkv" --append "docs\temp\BvS_6s.mkv" --append "docs\temp\BvS_7i_Cropped.mkv" --append "docs\temp\BvS_8s.mkv" --append "docs\temp\BvS_9i_Cropped.mkv" --append "docs\temp\BvS_10s.mkv" --video-codec copy --audio-codec copy --output-format mkv --save "docs\temp\BvS_1.78.mkv"
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
@@ -285,24 +286,24 @@ if %version%==1 (
 	if exist "!final_output!" goto output_exists
 	if %dialog%==y (
 		if %dialog2%==y (
-			docs\programs\mkvtoolnix\mkvmerge -o "!folder!\Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.78.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.78.mkv" -D --no-video "%file%" > "docs\temp\final-remux.log" 2>&1
+			docs\programs\mkvtoolnix\mkvmerge -o "!folder!\Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.78.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.78.mkv" -D --no-video "%file%" > "%RESTORER_LOG_DIRECTORY%\final-remux.log" 2>&1
 			if errorlevel 2 goto remux_failed
 			if errorlevel 1 goto remux_warning
 			if not errorlevel 0 goto remux_failed
 		) else if %dialog2%==n (
-			docs\programs\mkvtoolnix\mkvmerge -o "!result!" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.78.mkv" -D --no-video "%file%" > "docs\temp\final-remux.log" 2>&1
+			docs\programs\mkvtoolnix\mkvmerge -o "!result!" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.78.mkv" -D --no-video "%file%" > "%RESTORER_LOG_DIRECTORY%\final-remux.log" 2>&1
 			if errorlevel 2 goto remux_failed
 			if errorlevel 1 goto remux_warning
 			if not errorlevel 0 goto remux_failed
 		)
 	) else if %dialog%==n (
 		if %dialog2%==y (
-			docs\programs\mkvtoolnix\mkvmerge -o "!folder!\Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.78.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.78.mkv" -D --no-video !file! > "docs\temp\final-remux.log" 2>&1
+			docs\programs\mkvtoolnix\mkvmerge -o "!folder!\Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.78.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.78.mkv" -D --no-video !file! > "%RESTORER_LOG_DIRECTORY%\final-remux.log" 2>&1
 			if errorlevel 2 goto remux_failed
 			if errorlevel 1 goto remux_warning
 			if not errorlevel 0 goto remux_failed
 		) else if %dialog2%==n (
-			docs\programs\mkvtoolnix\mkvmerge -o "!result!" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.78.mkv" -D --no-video !file! > "docs\temp\final-remux.log" 2>&1
+			docs\programs\mkvtoolnix\mkvmerge -o "!result!" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.78.mkv" -D --no-video !file! > "%RESTORER_LOG_DIRECTORY%\final-remux.log" 2>&1
 			if errorlevel 2 goto remux_failed
 			if errorlevel 1 goto remux_warning
 			if not errorlevel 0 goto remux_failed
@@ -324,8 +325,8 @@ if %version%==1 (
 		echo.
 		echo ----------------------------------------------------------------
 		echo [%TIME%] Preparing the video-only working copy...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-		docs\programs\mkvtoolnix\mkvmerge -o "docs\temp\BvS.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "%file%" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+		docs\programs\mkvtoolnix\mkvmerge -o "docs\temp\BvS.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "%file%" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 		if errorlevel 2 goto stage_failed
 		if errorlevel 1 goto stage_warning
 		if not errorlevel 0 goto stage_failed
@@ -336,8 +337,8 @@ if %version%==1 (
 		echo.
 		echo ----------------------------------------------------------------
 		echo [%TIME%] Preparing the video-only working copy...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-		docs\programs\mkvtoolnix\mkvmerge -o "docs\temp\BvS.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags !file! >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+		docs\programs\mkvtoolnix\mkvmerge -o "docs\temp\BvS.mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags !file! >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 		if errorlevel 2 goto stage_failed
 		if errorlevel 1 goto stage_warning
 		if not errorlevel 0 goto stage_failed
@@ -350,8 +351,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Copying a video section without encoding...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 7388 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_1i.mkv" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 7388 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_1i.mkv" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_1i.mkv"
@@ -360,8 +361,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Copying a video section without encoding...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 01:04:51.470 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 6427 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_3i.mkv" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 01:04:51.470 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 6427 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_3i.mkv" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_3i.mkv"
@@ -370,8 +371,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Copying a video section without encoding...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:02:58.190 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 10633 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_5i.mkv" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:02:58.190 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 10633 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_5i.mkv" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_5i.mkv"
@@ -380,8 +381,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Copying a video section without encoding...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:41:18.377 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 13366 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_7i.mkv" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:41:18.377 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 13366 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_7i.mkv" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_7i.mkv"
@@ -390,8 +391,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Copying a video section without encoding...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:53:29.482 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 1804 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_9i.mkv" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:53:29.482 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 1804 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_9i.mkv" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_9i.mkv"
@@ -404,8 +405,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Copying a video section without encoding...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 00:05:09.142 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 85890 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_2s.mkv" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 00:05:09.142 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 85890 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_2s.mkv" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_2s.mkv"
@@ -416,8 +417,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Encoding a section - this can take a long time...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_2s.mkv" -o "docs\temp\BvS_2s_Windowboxed.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 51400 --cfr -2 -w 3080 -l 1732 --crop-mode "none" --non-anamorphic --pad "width=3840:height=2160" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_2s.mkv" -o "docs\temp\BvS_2s_Windowboxed.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 51400 --cfr -2 -w 3080 -l 1732 --crop-mode "none" --non-anamorphic --pad "width=3840:height=2160" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_2s_Windowboxed.mkv"
@@ -426,8 +427,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Copying a video section without encoding...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 01:09:18.715 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 77191 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_4s.mkv" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 01:09:18.715 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 77191 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_4s.mkv" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_4s.mkv"
@@ -438,8 +439,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Encoding a section - this can take a long time...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_4s.mkv" -o "docs\temp\BvS_4s_Windowboxed.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 51700 --cfr -2 -w 3080 -l 1732 --crop-mode "none" --non-anamorphic --pad "width=3840:height=2160" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_4s.mkv" -o "docs\temp\BvS_4s_Windowboxed.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 51700 --cfr -2 -w 3080 -l 1732 --crop-mode "none" --non-anamorphic --pad "width=3840:height=2160" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_4s_Windowboxed.mkv"
@@ -448,8 +449,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Copying a video section without encoding...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:10:22.606 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 44494 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_6s.mkv" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:10:22.606 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 44494 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_6s.mkv" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_6s.mkv"
@@ -460,8 +461,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Encoding a section - this can take a long time...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_6s.mkv" -o "docs\temp\BvS_6s_Windowboxed.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 59500 --cfr -2 -w 3080 -l 1732 --crop-mode "none" --non-anamorphic --pad "width=3840:height=2160" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_6s.mkv" -o "docs\temp\BvS_6s_Windowboxed.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 59500 --cfr -2 -w 3080 -l 1732 --crop-mode "none" --non-anamorphic --pad "width=3840:height=2160" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_6s_Windowboxed.mkv"
@@ -470,8 +471,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Copying a video section without encoding...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:50:35.850 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 4163 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_8s.mkv" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:50:35.850 -noaccurate_seek -i "docs\temp\BvS.mkv" -vframes 4163 -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_8s.mkv" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_8s.mkv"
@@ -482,8 +483,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Encoding a section - this can take a long time...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_8s.mkv" -o "docs\temp\BvS_8s_Windowboxed.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 48900 --cfr -2 -w 3080 -l 1732 --crop-mode "none" --non-anamorphic --pad "width=3840:height=2160" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_8s.mkv" -o "docs\temp\BvS_8s_Windowboxed.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 48900 --cfr -2 -w 3080 -l 1732 --crop-mode "none" --non-anamorphic --pad "width=3840:height=2160" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_8s_Windowboxed.mkv"
@@ -492,8 +493,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Copying a video section without encoding...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:54:43.862 -noaccurate_seek -i "docs\temp\BvS.mkv" -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_10s.mkv" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\ffmpeg\ffmpeg -nostdin -threads 0 -ss 02:54:43.862 -noaccurate_seek -i "docs\temp\BvS.mkv" -c:v copy -map v:0 -map_chapters -1 -map_metadata -1 -y "docs\temp\BvS_10s.mkv" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_10s.mkv"
@@ -504,8 +505,8 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Encoding a section - this can take a long time...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
-	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_10s.mkv" -o "docs\temp\BvS_10s_Windowboxed.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 30000 --cfr -2 -w 3080 -l 1732 --crop-mode "none" --non-anamorphic --pad "width=3840:height=2160" >> "docs\temp\processing.log" 2>&1
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
+	docs\programs\handbrake\HandBrakeCLI -i "docs\temp\BvS_10s.mkv" -o "docs\temp\BvS_10s_Windowboxed.mkv" -e x265_10bit --encoder-preset "fast" --encoder-profile "auto" --encoder-level "auto" -b 30000 --cfr -2 -w 3080 -l 1732 --crop-mode "none" --non-anamorphic --pad "width=3840:height=2160" >> "%RESTORER_LOG_DIRECTORY%\processing.log" 2>&1
 	if errorlevel 1 goto stage_failed
 	if not errorlevel 0 goto stage_failed
 	call :require_stage_output "docs\temp\BvS_10s_Windowboxed.mkv"
@@ -538,7 +539,7 @@ if %version%==1 (
 	echo.
 	echo ----------------------------------------------------------------
 	echo [%TIME%] Joining the processed sections...
-	echo Stage: !stage_name!>> "docs\temp\processing.log"
+	echo Stage: !stage_name!>> "%RESTORER_LOG_DIRECTORY%\processing.log"
 	echo Assembly diagnostics and any questions appear in this window, not processing.log.
 	echo Answer only an explicit assembly question: y continues despite its warning; n declines.
 	echo Continuing does not establish codec compatibility or seamless joins.
@@ -559,24 +560,24 @@ if %version%==1 (
 	if exist "!final_output!" goto output_exists
 	if %dialog%==y (
 		if %dialog2%==y (
-			docs\programs\mkvtoolnix\mkvmerge -o "!folder!\Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.43 (unmasked).mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.43.mkv" -D --no-video "%file%" > "docs\temp\final-remux.log" 2>&1
+			docs\programs\mkvtoolnix\mkvmerge -o "!folder!\Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.43 (unmasked).mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.43.mkv" -D --no-video "%file%" > "%RESTORER_LOG_DIRECTORY%\final-remux.log" 2>&1
 			if errorlevel 2 goto remux_failed
 			if errorlevel 1 goto remux_warning
 			if not errorlevel 0 goto remux_failed
 		) else if %dialog2%==n (
-			docs\programs\mkvtoolnix\mkvmerge -o "!result!" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.43.mkv" -D --no-video "%file%" > "docs\temp\final-remux.log" 2>&1
+			docs\programs\mkvtoolnix\mkvmerge -o "!result!" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.43.mkv" -D --no-video "%file%" > "%RESTORER_LOG_DIRECTORY%\final-remux.log" 2>&1
 			if errorlevel 2 goto remux_failed
 			if errorlevel 1 goto remux_warning
 			if not errorlevel 0 goto remux_failed
 		)
 	) else if %dialog%==n (
 		if %dialog2%==y (
-			docs\programs\mkvtoolnix\mkvmerge -o "!folder!\Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.43 (unmasked).mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.43.mkv" -D --no-video !file! > "docs\temp\final-remux.log" 2>&1
+			docs\programs\mkvtoolnix\mkvmerge -o "!folder!\Batman v Superman Dawn of Justice Ultimate Edition IMAX 1.43 (unmasked).mkv" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.43.mkv" -D --no-video !file! > "%RESTORER_LOG_DIRECTORY%\final-remux.log" 2>&1
 			if errorlevel 2 goto remux_failed
 			if errorlevel 1 goto remux_warning
 			if not errorlevel 0 goto remux_failed
 		) else if %dialog2%==n (
-			docs\programs\mkvtoolnix\mkvmerge -o "!result!" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.43.mkv" -D --no-video !file! > "docs\temp\final-remux.log" 2>&1
+			docs\programs\mkvtoolnix\mkvmerge -o "!result!" -A --no-audio -S --no-subtitles -B --no-buttons --no-chapters -M --no-attachments --no-global-tags "docs\temp\BvS_1.43.mkv" -D --no-video !file! > "%RESTORER_LOG_DIRECTORY%\final-remux.log" 2>&1
 			if errorlevel 2 goto remux_failed
 			if errorlevel 1 goto remux_warning
 			if not errorlevel 0 goto remux_failed
@@ -602,9 +603,8 @@ echo [OK] Restoration complete.
 echo ================================================================
 echo Output: "%completed_output%"
 echo The final MKV contains the restored video and the selected original audio and subtitles.
-echo Working files and logs remain in "%~dp0docs\temp".
-echo Move that folder aside before starting another restoration.
-PAUSE
+echo Logs: "%RESTORER_LOG_DIRECTORY%"
+
 popd
 exit /b 0
 
@@ -627,22 +627,9 @@ if not exist "docs\" (
     popd
     exit /b 2
 )
-if exist "docs\temp" (
-    echo.
-    echo ================================================================
-    echo [STOP] Temporary work already exists in "%~dp0docs\temp".
-    echo ================================================================
-    echo Preserve or move that folder before starting another restoration.
-    echo No existing temporary files have been deleted.
-    popd
-    exit /b 2
-)
-mkdir "docs\temp"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "docs\scripts\Manage-Workspace.ps1" -Action CheckOwned -Film BvS
 if errorlevel 1 (
-    echo.
-    echo ================================================================
-    echo [STOP] Cannot create the temporary workspace. Processing has not started.
-    echo ================================================================
+    echo [STOP] Cannot use the temporary workspace. Close any previous restoration and try again.
     popd
     exit /b 2
 )
@@ -663,9 +650,9 @@ echo.
 echo ================================================================
 echo [STOP] Processing stopped with a warning at !stage_name!.
 echo ================================================================
-echo Intermediate files and diagnostics are retained in docs\temp.
-echo Next: keep this window and all files; share docs\temp\processing.log for diagnosis.
-echo Do not rerun the launcher or delete completed encodes.
+echo Temporary videos remain in docs\temp. Logs are kept separately.
+echo Logs: "%RESTORER_LOG_DIRECTORY%"
+echo You can start a new restoration after closing this run.
 PAUSE
 popd
 exit /b 1
@@ -675,9 +662,9 @@ echo.
 echo ================================================================
 echo [STOP] Processing failed at !stage_name!.
 echo ================================================================
-echo Intermediate files and diagnostics are retained in docs\temp.
-echo Next: keep this window and all files; share docs\temp\processing.log for diagnosis.
-echo Do not rerun the launcher or delete completed encodes.
+echo Temporary videos remain in docs\temp. Logs are kept separately.
+echo Logs: "%RESTORER_LOG_DIRECTORY%"
+echo You can start a new restoration after closing this run.
 PAUSE
 popd
 exit /b 2
@@ -688,8 +675,8 @@ echo ================================================================
 echo [STOP] Final remux completed with warnings. The output needs review.
 echo ================================================================
 echo The assembled video is retained at docs\temp\BvS_1.78.mkv or docs\temp\BvS_1.43.mkv
-echo Details are in docs\temp\final-remux.log
-echo A new run will preserve this folder and stop until you move it aside.
+echo Details are in "%RESTORER_LOG_DIRECTORY%\final-remux.log"
+echo Temporary work is cleared automatically when you start a new restoration.
 PAUSE
 popd
 exit /b 1
@@ -700,8 +687,8 @@ echo ================================================================
 echo [STOP] Final remux failed. Any destination output may be incomplete; do not use it.
 echo ================================================================
 echo The assembled video is retained at docs\temp\BvS_1.78.mkv or docs\temp\BvS_1.43.mkv
-echo Details are in docs\temp\final-remux.log
-echo A new run will preserve this folder and stop until you move it aside.
+echo Details are in "%RESTORER_LOG_DIRECTORY%\final-remux.log"
+echo Temporary work is cleared automatically when you start a new restoration.
 PAUSE
 popd
 exit /b 2
@@ -712,7 +699,7 @@ echo ================================================================
 echo [STOP] Output appeared after setup. Final remux was not started.
 echo ================================================================
 echo Existing output and all intermediate work have been preserved.
-echo Next: keep the workspace and resolve the destination conflict before retrying.
+echo Choose another destination before starting again.
 PAUSE
 popd
 exit /b 2

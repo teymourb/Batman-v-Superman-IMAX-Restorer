@@ -91,7 +91,12 @@ function Check-Selection {
     if ([string]::Equals($Source,$ExpectedOutput,[StringComparison]::OrdinalIgnoreCase)) { throw 'The source and output paths must be different.' }
     if (Test-Path -LiteralPath $ExpectedOutput) { throw "The output already exists: $ExpectedOutput. Choose another folder; existing files will not be overwritten." }
     $workspace = Join-Path $root 'docs\temp'
-    if (Test-Path -LiteralPath $workspace) { throw "Existing work found at $workspace. Preserve it and review the logs before moving it aside. Nothing was deleted." }
+    foreach ($protected in @($workspace, (Join-Path $root 'docs\logs'))) {
+        $prefix = $protected.TrimEnd('\') + '\'
+        foreach ($selected in @($Source, $Destination)) {
+            if ($selected.Equals($protected,[StringComparison]::OrdinalIgnoreCase) -or $selected.StartsWith($prefix,[StringComparison]::OrdinalIgnoreCase)) { throw 'Choose source and output locations outside the program working and log folders.' }
+        }
+    }
 }
 function Wait-ForDialog([bool]$IsSource) {
     $prompt = if ($IsSource) { 'Press Enter to open the file-selection window, or Q to quit' } else { 'Press Enter to open the output-folder window, or Q to quit' }
@@ -149,7 +154,6 @@ try {
             Show-Wrapped 'An MKV rip of the Asteroid City Blu-ray disc.'
         }
         Show-Wrapped 'Only the unaltered video track from this specific disc is supported.'
-        if ($Film -eq 'BvS') { Show-Wrapped 'Source matching ignores added Dolby Vision RPU metadata; this restorer targets HDR10 output.' }
         Show-Wrapped 'No other version will work. You may keep whichever audio and subtitle tracks you wish in your rip.'
         Write-Host ''
         Show-Wrapped 'Your original MKV is not modified. The restoration is saved as a separate file.'
@@ -228,7 +232,11 @@ try {
     Show-Wrapped '- Before restoration, the source check temporarily extracts the video track and then removes that extraction.'
     Show-Wrapped '- Allow free space approximately equal to the source MKV size plus 1 GiB for that check.'
     Show-Wrapped '- Allow room for several large temporary video files as well as the final MKV.'
-    Show-Wrapped '- Temporary videos and logs are kept in the working folder after processing.'
+    Show-Wrapped '- Temporary videos are removed automatically after completion and before a new restoration.'
+    Show-Wrapped '- If a run is interrupted, close the program before manually deleting temporary work from:'
+    Show-Wrapped (Join-Path $root 'docs\temp')
+    Show-Wrapped '- Diagnostic logs are kept separately in:'
+    Show-Wrapped (Join-Path $root 'docs\logs')
     Show-Wrapped '- Processing can take several hours. Keep this window open and your PC awake.'
     Show-Heading 'Y - start / N or Q - quit'
     while ($true) {
@@ -239,19 +247,15 @@ try {
     }
     $Launcher = Get-PathValue $Launcher
     if (-not [IO.File]::Exists($Launcher)) { throw 'The launcher is missing.' }
-    $start = New-Object Diagnostics.ProcessStartInfo
-    $start.FileName = $env:ComSpec
-    $start.Arguments = '/d /v:off /c ""' + $Launcher + '" --selected"'
-    $start.UseShellExecute = $false
-    $start.WorkingDirectory = $root
-    $start.EnvironmentVariables['file'] = $Source
-    $start.EnvironmentVariables['folder'] = $Destination
-    $start.EnvironmentVariables['version'] = $Mode
-    $start.EnvironmentVariables['dialog'] = 'y'
-    $start.EnvironmentVariables['dialog2'] = 'y'
-    $start.EnvironmentVariables['RESTORER_SELECTION_READY'] = '1'
-    $process = [Diagnostics.Process]::Start($start)
-    $process.WaitForExit()
-    exit $process.ExitCode
+    $manager = Join-Path $PSScriptRoot 'Manage-Workspace.ps1'
+    if (-not [IO.File]::Exists($manager)) { throw 'Workspace helper is missing. Extract the complete application ZIP.' }
+    $env:file = $Source
+    $env:folder = $Destination
+    $env:version = $Mode
+    $env:dialog = 'y'
+    $env:dialog2 = 'y'
+    $env:RESTORER_SELECTION_READY = '1'
+    & $manager -Action Supervise -Film $Film -Launcher $Launcher
+    exit $LASTEXITCODE
 } catch [OperationCanceledException] { Write-Host $_.Exception.Message; exit 3 }
 catch { Write-Host ('Cannot start: ' + $_.Exception.Message); Write-Host 'No media tool was started by setup.'; exit 2 }
