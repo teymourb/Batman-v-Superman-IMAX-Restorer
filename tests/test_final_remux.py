@@ -31,6 +31,7 @@ def media_commands(text):
         if line.startswith('docs\\programs\\'):
             line = line.split(' > "docs\\temp\\final-remux.log"', 1)[0]
             line = line.split(' >> "docs\\temp\\processing.log"', 1)[0]
+            line = re.split(r' [>]{1,2} "[!%]RESTORER_LOG_DIRECTORY[!%]\\(?:final-remux|processing)\.log"', line, maxsplit=1)[0]
             if line.startswith('docs\\programs\\ffmpeg\\ffmpeg '):
                 line = line.replace(' -nostdin', '')
             commands.append(line)
@@ -58,7 +59,7 @@ class SourceRegression(unittest.TestCase):
         self.assertNotRegex(handlers, r'(?im)^\s*(del|rmdir)\s')
         self.assertIn('exit /b 1', handlers)
         self.assertIn('exit /b 2', handlers)
-        self.assertIn('A new run will preserve this folder', handlers)
+        self.assertIn('%RESTORER_LOG_DIRECTORY%\\final-remux.log', handlers)
 
 
 @unittest.skipUnless(os.name == 'nt', 'requires actual Windows cmd.exe')
@@ -106,6 +107,7 @@ class WindowsRemux(unittest.TestCase):
             else:
                 shutil.copyfile(self.stub, tools / 'mkvmerge.exe')
         env = os.environ.copy()
+        env['RESTORER_LOG_DIRECTORY'] = str(temp)
         env['RESTORER_VALIDATION_MODE'] = 'exhaustive'
         env.update(dialog=dialog, dialog2=dialog2,
                    file=str(source_path) if dialog == 'y' else '"' + str(source_path) + '"',
@@ -153,7 +155,7 @@ class WindowsRemux(unittest.TestCase):
                     self.assertEqual(output.name, 'Batman v Superman Dawn of Justice Ultimate Edition IMAX ' + expected + '.mkv')
                     self.assertIn('stub diagnostic', (root / 'docs/temp/final-remux.log').read_text())
                     if code:
-                        self.assertIn('A new run will preserve', result.stdout)
+                        self.assertIn('retained', result.stdout.lower())
 
     def test_missing_executable_and_empty_output_retain_intermediate(self):
         for missing, empty, no_output in ((True, False, False), (False, True, False),

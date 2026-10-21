@@ -1,4 +1,8 @@
-"""Actual batch mode control flow with native synthetic tools; no film data."""
+"""Actual stage flow with synthetic tools; supervisor cleanup is tested separately.
+
+These extracted-pipeline fixtures intentionally retain files for failure assertions.
+Whole-launcher selection fixtures cover successful automatic cleanup.
+"""
 import os
 from pathlib import Path
 import re
@@ -62,7 +66,7 @@ class WindowsStages(unittest.TestCase):
                 # Exercise production invocation/status gate without decoding stub bytes.
                 (scripts/'Validate-Assembly.ps1').write_text('exit '+str(validator_code)+'\n')
             source=root/'synthetic source.mkv';source.write_bytes(b'original sentinel')
-            env=os.environ.copy();env['RESTORER_VALIDATION_MODE']='exhaustive';env['STAGE_QUESTION']='yes' if assembly_question else '';env.update(version=str(mode),dialog=dialog,dialog2='y',file=str(source) if dialog=='y' else '"'+str(source)+'"',folder=str(root),STAGE_TRACE=str(root/'trace'),STAGE_FAIL_AT=str(fail),STAGE_CODE=str(code),STAGE_ACTION=action)
+            env=os.environ.copy();env['RESTORER_LOG_DIRECTORY']=str(root/'docs/temp');env['RESTORER_VALIDATION_MODE']='exhaustive';env['STAGE_QUESTION']='yes' if assembly_question else '';env.update(version=str(mode),dialog=dialog,dialog2='y',file=str(source) if dialog=='y' else '"'+str(source)+'"',folder=str(root),STAGE_TRACE=str(root/'trace'),STAGE_FAIL_AT=str(fail),STAGE_CODE=str(code),STAGE_ACTION=action)
             harness='@echo off\nsetlocal EnableDelayedExpansion\npushd "%~dp0"\n'+PIPELINE
             harness=re.sub(r'(?im)^\s*PAUSE\s*$', 'rem noninteractive harness',harness)
             (root/'run.bat').write_bytes(harness.replace('\n','\r\n').encode())

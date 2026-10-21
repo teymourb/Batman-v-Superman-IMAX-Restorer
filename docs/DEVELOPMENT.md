@@ -1,3 +1,17 @@
+# Automatic workspace cleanup — 2026-10-21
+
+Owner authorized silent discard on confirmed fresh start and after successful
+processing, retaining small logs separately. Generated restoration media use
+docs/temp; diagnostics use docs/logs/run-GUID. No automatic resume. Startup text
+explains manual deletion only after closing the program. The workspace supervisor
+must exclude concurrent runs and terminate only its own descendants before cleanup;
+path containment/reparse guards protect originals, outputs and unrelated files.
+Existing success checks remain operational, not decoded quality qualification.
+Earlier retention-policy sections below are historical and superseded here.
+Windows evidence for this revision is pending; do not ship preceding candidate ZIPs.
+Owner confirmed logo distribution permission and deferred dependency provenance
+improvements/tool upgrades; no binaries or media recipes change in this patch.
+
 # Dialog readiness — 2026-10-20
 
 Each native file/folder dialog waits for Enter after printing its instructions.

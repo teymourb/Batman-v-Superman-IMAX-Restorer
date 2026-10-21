@@ -4,7 +4,8 @@ param(
     [Parameter(Mandatory=$true)][ValidateSet('BvS','Asteroid')][string]$Film,
     [Parameter(Mandatory=$true)][string]$Source,
     [Parameter(Mandatory=$true)][string]$WorkDirectory,
-    [string]$InstallationRoot
+    [string]$InstallationRoot,
+    [string]$ScratchDirectory
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -103,7 +104,15 @@ try {
     if (Test-Path -LiteralPath $recordPath) { throw 'An earlier source-check record exists. Preserve this workspace before starting again.' }
     $script:diagnostics = Join-Path $work.FullName ('source-check-' + [Guid]::NewGuid().ToString('N'))
     $null = [IO.Directory]::CreateDirectory($script:diagnostics)
-    $scratch = Join-Path $script:diagnostics 'extracted-video.bin'
+    $scratchRoot = $script:diagnostics
+    if ($ScratchDirectory) {
+        $scratchItem = Get-Item -LiteralPath $ScratchDirectory
+        if (-not $scratchItem.PSIsContainer -or ($scratchItem.Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw 'Source scratch directory must be an existing ordinary directory.' }
+        $scratchRoot = $scratchItem.FullName
+    }
+    $candidateScratch = Join-Path $scratchRoot 'extracted-video.bin'
+    if (Test-Path -LiteralPath $candidateScratch) { throw 'Source scratch file already exists. Start a fresh restoration.' }
+    $scratch = $candidateScratch
     $inputFile = Get-Item -LiteralPath $Source
     if ($inputFile.PSIsContainer -or $inputFile.Length -le 0 -or ($inputFile.Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw 'Source must be a nonempty ordinary file.' }
     $Source = $inputFile.FullName

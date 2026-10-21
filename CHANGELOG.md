@@ -1,3 +1,11 @@
+## Pending release preparation — 2026-10-21
+
+- Silently clean generated temporary videos after success and before a confirmed
+  fresh run; keep diagnostic logs in a separate folder.
+- Protect source/output locations and exclude concurrent workspace use.
+- Explain where interrupted temporary work can be deleted after closing the program.
+- Refresh public README installation/use instructions while retaining restoration descriptions.
+
 ## Dialog readiness — unreleased
 
 Pause for Enter before opening each file/folder dialog, so the preceding

@@ -38,6 +38,7 @@ OVERLAYS = {
     'docs/licenses/HandBrake-GPL-2.0.txt': 'docs/licenses/HandBrake-GPL-2.0.txt',
     'docs/licenses/FFmpeg-GPL-3.0.txt': 'docs/licenses/FFmpeg-GPL-3.0.txt',
     'docs/scripts/Select-Restoration.ps1': 'docs/scripts/Select-Restoration.ps1',
+    'docs/scripts/Manage-Workspace.ps1': 'docs/scripts/Manage-Workspace.ps1',
     'docs/scripts/Test-SourceFingerprint.ps1': 'docs/scripts/Test-SourceFingerprint.ps1',
     'docs/SOURCE-FINGERPRINT.md': 'docs/SOURCE-FINGERPRINT.md',
 }
