@@ -1,3 +1,18 @@
+# Published checkpoint — 2026-10-21
+
+Version 1.0.1 is published with its complete ZIP and SHA256SUMS.txt:
+https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/releases/tag/v1.0.1
+
+The cleanup/runtime revision passed 82 tests with zero skips in each fully
+provisioned Windows MKVToolNix 78/102 job. Public ZIP downloads were independently
+checked against local SHA256 values and all ZIP CRCs verified after publication.
+Windows evidence: https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/actions/runs/39525388022
+
+CHANGELOG.md now describes shipped behavior. The following dated implementation
+notes are historical; references to pending qualification/publication or earlier
+retention policies do not describe the published version. Post-release record
+corrections do not alter published tags, ZIPs, binaries or processing commands.
+
 # Automatic workspace cleanup — 2026-10-21
 
 Owner authorized silent discard on confirmed fresh start and after successful

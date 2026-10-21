@@ -1,58 +1,25 @@
-## Pending release preparation — 2026-10-21
-
-- Silently clean generated temporary videos after success and before a confirmed
-  fresh run; keep diagnostic logs in a separate folder.
-- Protect source/output locations and exclude concurrent workspace use.
-- Explain where interrupted temporary work can be deleted after closing the program.
-- Refresh public README installation/use instructions while retaining restoration descriptions.
-
-## Dialog readiness — unreleased
-
-Pause for Enter before opening each file/folder dialog, so the preceding
-instructions remain readable. Q quits before a dialog opens. Manual path entry,
-source verification and restoration behavior are unchanged.
-
-## Console presentation — unreleased
-
-Group setup and results with ASCII headings and spacing. Wrap long displayed
-paths without changing their values. Show one shared free-space figure for a
-shared drive. Source-check elapsed progress updates in place on an interactive
-console; redirected logs remain ordinary lines. Processing recipes are unchanged.
-
-## Mandatory source recognition — unreleased
-
-Check the supported compressed video before restoration starts. BvS recognizes
-its confirmed HDR10 base stream with or without the tested added Profile 8.1 RPU;
-Asteroid checks its original AVC extraction. Wrong sources and failed checks stop
-with diagnostics. No video encoding or decoding is performed by this check.
-Only its own temporary extraction is removed. Film-processing recipes are unchanged.
-
 # Changelog
 
-## Unreleased — proposed 1.0.1
+## 1.0.1 — 2026-10-21
 
-- Rewrite setup, processing and completion messages using the original source
-  requirements and restoration descriptions; remove developer qualification
-  choices and frame-comparison reports from the released workflow.
-- Keep frame comparison, fixtures and qualification helpers in developer tools,
-  separate from the application and its public package.
-- Disable accidental FFmpeg keyboard input and show Avidemux questions and
-  diagnostics directly in the console. Warnings are not automatically accepted.
-- Stop failed preparation/splitting/encoding/assembly, record stage diagnostics
-  and reject missing/empty outputs before dependent work. Catch native crashes.
-- Preserve intermediates and logs after completion or failure. Retention alone
-  does not turn successful completion into a warning; actual tool warnings and
-  errors remain separate. Allow additional disk space for retained files.
+- Check the supported source-video fingerprint before restoration starts; stop on
+  unsupported sources or source-check failures without re-encoding the source.
+- Provide native source/output dialogs, Enter-before-dialog instructions, manual
+  path fallback, clear restoration choices, confirmation and cancellation.
+- Improve setup, stage progress, completion and error messages.
+- Stop on reported tool failures or missing/empty expected outputs; protect
+  existing destination files and retain diagnostic logs.
+- Keep generated temporary videos in `docs/temp` and run logs separately in
+  `docs/logs`. Silently clean known temporary videos after success and before a
+  confirmed fresh run; protect unrelated files and active workspaces.
+- Explain safe manual removal of interrupted work after closing the program.
+  Automatic resume is not implemented.
+- Refresh the README while retaining original comparison GIFs, credits and modes.
+- Validate the maintenance changes with Windows synthetic regression tests.
 
-- Anchor execution to the launcher folder and refuse an existing temporary
-  workspace instead of deleting retained work on restart.
-- Remove wildcard cleanup; preserve unexpected temporary files/subdirectories
-  and restore the caller directory on success, warnings and errors.
+Film-specific split points, transformations, encoding settings, assembly order
+and bundled processing tool versions remain unchanged.
 
-- Retain the assembled video and final-remux diagnostic log when MKVToolNix
-  reports warnings or errors, or the destination output is missing or empty.
-- Report final-remux warning/error status instead of continuing to success cleanup.
-- Add focused Windows regressions and synthetic remux checks for both modes.
-- Preserve existing cuts, transforms, encoding settings and remux arguments.
+[Release notes and complete download](https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/releases/tag/v1.0.1)
 
-No new downloadable release has been published. Read README.md for usage and known limitations.
+[Earlier releases](https://github.com/teymourb/Batman-v-Superman-IMAX-Restorer/releases)
