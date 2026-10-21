@@ -40,9 +40,11 @@ class WindowsWorkspace(unittest.TestCase):
                 harness='@echo off\nsetlocal DisableDelayedExpansion\ncall :prepare_workspace\nif errorlevel 1 exit /b 2\necho PROCESSING_STARTED\npopd\nexit /b 0\n'+HELPERS
                 harness=re.sub(r'(?im)^\s*PAUSE\s*$','rem unattended fixture',harness)
                 (install/'run.bat').write_bytes(harness.replace('\n','\r\n').encode())
+                (caller/'wrapper.bat').write_bytes(b'@echo off\r\ncall "%WORKSPACE_TEST_SCRIPT%"\r\nexit /b %errorlevel%\r\n')
                 env=os.environ.copy()
+                env['WORKSPACE_TEST_SCRIPT']=str(install/'run.bat')
                 for name in ('RESTORER_WORKSPACE_TOKEN','RESTORER_LOG_DIRECTORY'):env.pop(name,None)
-                result=subprocess.run(['cmd.exe','/d','/v:off','/c',str(install/'run.bat')],cwd=caller,env=env,capture_output=True,text=True,input='\n',timeout=30)
+                result=subprocess.run(['cmd.exe','/d','/v:off','/c','wrapper.bat'],cwd=caller,env=env,capture_output=True,text=True,input='\n',timeout=30)
                 self.assertEqual(result.returncode,2,result.stdout+result.stderr)
                 self.assertNotIn('PROCESSING_STARTED',result.stdout)
                 self.assertEqual((foreign/'keep.txt').read_bytes(),b'caller sentinel')

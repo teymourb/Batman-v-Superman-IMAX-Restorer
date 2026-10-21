@@ -53,7 +53,7 @@ function Assert-Boundaries {
 function Read-Owner {
     Assert-Boundaries
     if (-not [IO.File]::Exists($marker)) { throw 'Unrecognized temporary work: preserve or move docs\temp manually; nothing was deleted.' }
-    $owner = Get-Content -LiteralPath $marker -Raw | ConvertFrom-Json
+    $owner = Get-Content -LiteralPath $marker -Raw -Encoding UTF8 | ConvertFrom-Json
     if ($owner.Schema -ne 1 -or $owner.Film -ne $Film -or $owner.Root -cne $root -or
         -not $owner.Token -or -not (Test-Within $owner.LogDirectory $logs)) {
         throw 'Workspace ownership record is invalid. Nothing was deleted.'
