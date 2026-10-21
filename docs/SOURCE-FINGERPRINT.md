@@ -40,9 +40,13 @@ it must not be described as the mkvextract executable hash.
 
 ## Runtime and evidence limits
 
-The helper runs before preparation/encoding, retains a fingerprint result and
-diagnostics in the new workspace, and owns a unique scratch extraction folder.
-Only its own scratch material may be cleaned; pre-existing work is preserved.
+The helper runs before preparation/encoding. In the production launcher, its
+fingerprint result (`source-fingerprint.json`) and diagnostic subdirectory
+(`source-check-<GUID>`) are retained under `docs/logs/run-<GUID>`. The temporary
+extracted video is `docs/temp/extracted-video.bin`; the helper removes its own
+extraction after the check. Diagnostic records remain separate from the generated
+restoration media removed at completion or confirmed fresh start. Unrecognized
+working files are not automatically deleted.
 The full extracted video temporarily requires substantial additional free space.
 A mismatch or failed identification/extraction/hash must stop restoration. No
 production override or user-selected expected hash is provided.

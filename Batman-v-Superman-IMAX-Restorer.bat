@@ -44,7 +44,7 @@ setlocal EnableDelayedExpansion
 echo.
 echo ----------------------------------------------------------------
 echo Processing started. Keep this window open and the PC awake.
-echo Detailed tool progress: %RESTORER_LOG_DIRECTORY%\processing.log
+echo Detailed tool progress: "%RESTORER_LOG_DIRECTORY%\processing.log"
 echo Copying and encoding can take a long time. Detailed progress is saved in the log.
 
 
@@ -675,7 +675,7 @@ echo ================================================================
 echo [STOP] Final remux completed with warnings. The output needs review.
 echo ================================================================
 echo The assembled video is retained at docs\temp\BvS_1.78.mkv or docs\temp\BvS_1.43.mkv
-echo Details are in %RESTORER_LOG_DIRECTORY%\final-remux.log
+echo Details are in "%RESTORER_LOG_DIRECTORY%\final-remux.log"
 echo Temporary work is cleared automatically when you start a new restoration.
 PAUSE
 popd
@@ -687,7 +687,7 @@ echo ================================================================
 echo [STOP] Final remux failed. Any destination output may be incomplete; do not use it.
 echo ================================================================
 echo The assembled video is retained at docs\temp\BvS_1.78.mkv or docs\temp\BvS_1.43.mkv
-echo Details are in %RESTORER_LOG_DIRECTORY%\final-remux.log
+echo Details are in "%RESTORER_LOG_DIRECTORY%\final-remux.log"
 echo Temporary work is cleared automatically when you start a new restoration.
 PAUSE
 popd
